@@ -6,7 +6,7 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join('./'))
+sys.path.append(os.path.join('../'))
 from base import PlotBase, plot2d
 obj = plot2d()
 obj.create_tempdir(-1)

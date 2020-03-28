@@ -6,16 +6,27 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join('./'))
-from base import plot3d
+sys.path.append(os.path.join('../'))
+from base import plot2d, plot3d
+
 obj = plot3d()
 
 
-def wedge01_monte_carlo_test():
+def cube01_monomial_integral(e):
 
     # *****************************************************************************80
     #
-    # WEDGE01_MONTE_CARLO_TEST uses WEDGE01_SAMPLE with an increasing number of points.
+    # % CUBE01_MONOMIAL_INTEGRAL: integrals over the unit cube in 3D.
+    #
+    #  Discussion:
+    #
+    #    The integration region is
+    #
+    #      0 <= X <= 1,
+    #      0 <= Y <= 1,
+    #      0 <= Z <= 1.
+    #
+    #    The monomial is F(X,Y,Z) = X^E(1) * Y^E(2) * Z^E(3).
     #
     #  Licensing:
     #
@@ -23,7 +34,55 @@ def wedge01_monte_carlo_test():
     #
     #  Modified:
     #
-    #    13 November 2016
+    #    18 January 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Philip Davis, Philip Rabinowitz,
+    #    Methods of Numerical Integration,
+    #    Second Edition,
+    #    Academic Press, 1984, page 263.
+    #
+    #  Parameters:
+    #
+    #    Input, integer E(3), the exponents.  Each exponent must be nonnegative.
+    #
+    #    Output, real INTEGRAL, the integral.
+    #
+    from sys import exit
+
+    m = 3
+
+    if (e[0] < 0 or e[1] < 0 or e[2] < 0):
+        print('')
+        print('CUBE01_MONOMIAL_INTEGRAL - Fatal error!')
+        print('  All exponents must be nonnegative.')
+        exit('CUBE01_MONOMIAL_INTEGRAL - Fatal error!')
+
+    integral = 1.0
+    for i in range(0, m):
+        integral = integral / float(e[i] + 1)
+
+    return integral
+
+
+def cube01_monomial_integral_test():
+
+    # *****************************************************************************80
+    #
+    # % CUBE01_MONOMIAL_INTEGRAL_TEST tests CUBE01_MONOMIAL_INTEGRAL.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    21 June 2015
     #
     #  Author:
     #
@@ -33,65 +92,252 @@ def wedge01_monte_carlo_test():
     import platform
 
     m = 3
+    n = 4192
+    test_num = 20
+
+    print('')
+    print('CUBE01_MONOMIAL_INTEGRAL_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  CUBE01_MONOMIAL_INTEGRAL computes the integral of a monomial')
+    print('  within the interior of the unit cube in 3D.')
+    print('  Compare with a Monte Carlo estimate.')
+#
+#  Get sample points.
+#
+    seed = 123456789
+    x, seed = cube01_sample(n, seed)
+
+    print('')
+    print('  Number of sample points used is %d' % (n))
+#
+#  Randomly choose exponents.
+#
+    print('')
+    print('  Ex  Ey  Ez     MC-Estimate           Exact      Error')
+    print('')
+
+    for test in range(0, test_num):
+
+        e, seed = i4vec_uniform_ab(m, 0, 7, seed)
+
+        value = monomial_value(m, n, e, x)
+
+        result = cube01_volume() * np.sum(value) / float(n)
+        exact = cube01_monomial_integral(e)
+        error = abs(result - exact)
+
+        print('  %2d  %2d  %2d  %14.6g  %14.6g  %10.2g'
+              % (e[0], e[1], e[2], result, exact, error))
+#
+#  Terminate.
+#
+    print('')
+    print('CUBE01_MONOMIAL_INTEGRAL_TEST:')
+    print('  Normal end of execution.')
+    return
+
+
+def cube01_monte_carlo_test():
+
+    # *****************************************************************************80
+    #
+    # CUBE01_MONTE_CARLO_TEST estimates integrals over the unit cube in 3D.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    07 November 2016
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+
+    m = 3
 
     e_test = np.array([
         [0, 0, 0],
-        [1, 0, 0],
-        [0, 1, 0],
         [0, 0, 1],
         [2, 0, 0],
         [1, 1, 0],
+        [0, 1, 1],
         [0, 0, 2],
-        [3, 0, 0]])
+        [2, 2, 0],
+        [0, 0, 4]])
 
     print('')
-    print('WEDGE01_MONTE_CARLO_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  Use WEDGE01_SAMPLE for a Monte Carlo estimate of an')
-    print('  integral over the interior of the unit wedge in 3D.')
+    print('CUBE01_MONTE_CARLO_TEST')
+    print('  Use CUBE01_SAMPLE to estimate integrals')
+    print('  along the interior of the unit cube in 3D.')
 
+    obj.create_tempdir(-1)
     seed = 123456789
 
     print('')
-    print('         N        1               X               Y               Z                X^2            XY              Z^2            X^3')
+    txt = "\tN"
+    for e in e_test:
+        txt += "\t\tX^{:d} Y^{:d}".format(*e)
     print('')
 
     n = 1
     while (n <= 65536):
-        x, seed = wedge01_sample(n, seed)
+        x, seed = cube01_sample(n, seed)
         print('  %8d' % (n), end='')
-
         for e in e_test:
             value = monomial_value(m, n, e, x)
-            result = wedge01_volume() * np.sum(value[0:n]) / float(n)
+            result = cube01_volume() * np.sum(value[0:n]) / float(n)
             print('  %14.6g' % (result), end='')
         print('')
 
         obj.axs.scatter(*x, s=0.5)
         obj.axs.set_title("n={:d}".format(n))
-        #obj.axs.set_xlim(-r2 * 1.25 + center[0], r2 * 1.25 + center[0])
-        #obj.axs.set_ylim(-r2 * 1.25 + center[1], r2 * 1.25 + center[1])
         obj.SavePng_Serial()
         plt.close()
-        obj.new_fig()
 
         n = 2 * n
 
+    return
+
+
+def cube01_sample(n, seed):
+
+    # *****************************************************************************80
+    #
+    # CUBE01_SAMPLE samples points in the unit cube in 3D.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    21 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Parameters:
+    #
+    #    Input, integer N, the number of points.
+    #
+    #    Input/output, integer SEED, a seed for the random
+    #    number generator.
+    #
+    #    Output, real X(3,N), the points.
+    #
+    m = 3
+
+    x, seed = r8mat_uniform_01(m, n, seed)
+
+    return x, seed
+
+
+def cube01_sample_test():
+
+    # *****************************************************************************80
+    #
+    # CUBE01_SAMPLE_TEST tests CUBE01_SAMPLE.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    21 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import platform
+
     print('')
-    print('     Exact', end='')
+    print('CUBE01_SAMPLE_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  CUBE01_SAMPLE samples the unit cube.')
 
-    for j in range(0, 8):
+    n = 10
+    seed = 123456789
 
-        e[0:m] = e_test[j, 0:m]
-        result = wedge01_monomial_integral(e)
-        print('  %14.6g' % (result), end='')
+    x, seed = cube01_sample(n, seed)
 
-    print('')
+    r8mat_transpose_print(3, n, x, '  Sample points in the unit cube.')
 #
 #  Terminate.
 #
     print('')
-    print('WEDGE01_MONTE_CARLO_TEST')
+    print('CUBE01_SAMPLE_TEST')
+    print('  Normal end of execution.')
+    return
+
+
+def cube01_volume():
+
+    # *****************************************************************************80
+    #
+    # CUBE01_VOLUME returns the volume of the unit cube in 3D.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    21 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Parameters:
+    #
+    #    Output, real VALUE, the volume.
+    #
+    value = 1.0
+
+    return value
+
+
+def cube01_volume_test():
+
+    # *****************************************************************************80
+    #
+    # CUBE01_VOLUME tests CUBE01_VOLUME.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    21 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import platform
+
+    print('')
+    print('CUBE01_VOLUME_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  CUBE01_VOLUME returns the volume of the unit cube.')
+
+    value = cube01_volume()
+
+    print('')
+    print('  CUBE01_VOLUME() = %g' % (value))
+#
+#  Terminate.
+#
+    print('')
+    print('CUBE01_VOLUME_TEST')
     print('  Normal end of execution.')
     return
 
@@ -328,7 +574,7 @@ def i4vec_uniform_ab(n, a, b, seed):
 
     i4_huge = 2147483647
 
-    seed = int(seed)
+    seed = np.floor(seed)
 
     if (seed < 0):
         seed = seed + i4_huge
@@ -339,6 +585,7 @@ def i4vec_uniform_ab(n, a, b, seed):
         print('  Input SEED = 0!')
         exit('I4VEC_UNIFORM_AB - Fatal error!')
 
+    seed = np.floor(seed)
     a = round(a)
     b = round(b)
 
@@ -921,6 +1168,145 @@ def r8mat_transpose_print_some_test():
     return
 
 
+def r8mat_uniform_01(m, n, seed):
+
+    # *****************************************************************************80
+    #
+    # R8MAT_UNIFORM_01 returns a unit pseudorandom R8MAT.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    08 April 2013
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Paul Bratley, Bennett Fox, Linus Schrage,
+    #    A Guide to Simulation,
+    #    Second Edition,
+    #    Springer, 1987,
+    #    ISBN: 0387964673,
+    #    LC: QA76.9.C65.B73.
+    #
+    #    Bennett Fox,
+    #    Algorithm 647:
+    #    Implementation and Relative Efficiency of Quasirandom
+    #    Sequence Generators,
+    #    ACM Transactions on Mathematical Software,
+    #    Volume 12, Number 4, December 1986, pages 362-376.
+    #
+    #    Pierre L'Ecuyer,
+    #    Random Number Generation,
+    #    in Handbook of Simulation,
+    #    edited by Jerry Banks,
+    #    Wiley, 1998,
+    #    ISBN: 0471134031,
+    #    LC: T57.62.H37.
+    #
+    #    Peter Lewis, Allen Goodman, James Miller,
+    #    A Pseudo-Random Number Generator for the System/360,
+    #    IBM Systems Journal,
+    #    Volume 8, Number 2, 1969, pages 136-143.
+    #
+    #  Parameters:
+    #
+    #    Input, integer M, N, the number of rows and columns in the array.
+    #
+    #    Input, integer SEED, the integer "seed" used to generate
+    #    the output random number.
+    #
+    #    Output, real R(M,N), an array of random values between 0 and 1.
+    #
+    #    Output, integer SEED, the updated seed.  This would
+    #    normally be used as the input seed on the next call.
+    #
+    import numpy
+    from sys import exit
+
+    i4_huge = 2147483647
+
+    seed = int(seed)
+
+    if (seed < 0):
+        seed = seed + i4_huge
+
+    if (seed == 0):
+        print('')
+        print('R8MAT_UNIFORM_01 - Fatal error!')
+        print('  Input SEED = 0!')
+        exit('R8MAT_UNIFORM_01 - Fatal error!')
+
+    r = numpy.zeros((m, n))
+
+    for j in range(0, n):
+        for i in range(0, m):
+
+            k = (seed // 127773)
+
+            seed = 16807 * (seed - k * 127773) - k * 2836
+
+            seed = (seed % i4_huge)
+
+            if (seed < 0):
+                seed = seed + i4_huge
+
+            r[i, j] = seed * 4.656612875E-10
+
+    return r, seed
+
+
+def r8mat_uniform_01_test():
+
+    # *****************************************************************************80
+    #
+    # R8MAT_UNIFORM_01_TEST tests R8MAT_UNIFORM_01.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    31 October 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+    import platform
+
+    m = 5
+    n = 4
+    seed = 123456789
+
+    print('')
+    print('R8MAT_UNIFORM_01_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  R8MAT_UNIFORM_01 computes a random R8MAT.')
+    print('')
+    print('  0 <= X <= 1')
+    print('  Initial seed is %d' % (seed))
+
+    v, seed = r8mat_uniform_01(m, n, seed)
+
+    r8mat_print(m, n, v, '  Random R8MAT:')
+#
+#  Terminate.
+#
+    print('')
+    print('R8MAT_UNIFORM_01_TEST:')
+    print('  Normal end of execution.')
+    return
+
+
 def r8mat_uniform_ab(m, n, a, b, seed):
 
     # *****************************************************************************80
@@ -986,7 +1372,7 @@ def r8mat_uniform_ab(m, n, a, b, seed):
     #    Output, integer SEED, the updated seed.  This would
     #    normally be used as the input seed on the next call.
     #
-    import numpy
+    import numpy as np
     from sys import exit
 
     i4_huge = 2147483647
@@ -1002,7 +1388,7 @@ def r8mat_uniform_ab(m, n, a, b, seed):
         print('  Input SEED = 0!')
         exit('R8MAT_UNIFORM_AB - Fatal error!')
 
-    r = numpy.zeros([m, n])
+    r = np.zeros((m, n))
 
     for j in range(0, n):
         for i in range(0, m):
@@ -1010,6 +1396,8 @@ def r8mat_uniform_ab(m, n, a, b, seed):
             k = (seed // 127773)
 
             seed = 16807 * (seed - k * 127773) - k * 2836
+
+            seed = np.floor(seed)
 
             seed = (seed % i4_huge)
 
@@ -1068,209 +1456,6 @@ def r8mat_uniform_ab_test():
     return
 
 
-def r8vec_print(n, a, title):
-
-    # *****************************************************************************80
-    #
-    # R8VEC_PRINT prints an R8VEC.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    31 August 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, integer N, the dimension of the vector.
-    #
-    #    Input, real A(N), the vector to be printed.
-    #
-    #    Input, string TITLE, a title.
-    #
-    print('')
-    print(title)
-    print('')
-    for i in range(0, n):
-        print('%6d:  %12g' % (i, a[i]))
-
-
-def r8vec_print_test():
-
-    # *****************************************************************************80
-    #
-    # R8VEC_PRINT_TEST tests R8VEC_PRINT.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    29 October 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    print('')
-    print('R8VEC_PRINT_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8VEC_PRINT prints an R8VEC.')
-
-    n = 4
-    v = np.array([123.456, 0.000005, -1.0E+06, 3.14159265], dtype=np.float64)
-    r8vec_print(n, v, '  Here is an R8VEC:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8VEC_PRINT_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def r8vec_uniform_01(n, seed):
-
-    # *****************************************************************************80
-    #
-    # R8VEC_UNIFORM_01 returns a unit pseudorandom R8VEC.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    06 April 2013
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Reference:
-    #
-    #    Paul Bratley, Bennett Fox, Linus Schrage,
-    #    A Guide to Simulation,
-    #    Second Edition,
-    #    Springer, 1987,
-    #    ISBN: 0387964673,
-    #    LC: QA76.9.C65.B73.
-    #
-    #    Bennett Fox,
-    #    Algorithm 647:
-    #    Implementation and Relative Efficiency of Quasirandom
-    #    Sequence Generators,
-    #    ACM Transactions on Mathematical Software,
-    #    Volume 12, Number 4, December 1986, pages 362-376.
-    #
-    #    Pierre L'Ecuyer,
-    #    Random Number Generation,
-    #    in Handbook of Simulation,
-    #    edited by Jerry Banks,
-    #    Wiley, 1998,
-    #    ISBN: 0471134031,
-    #    LC: T57.62.H37.
-    #
-    #    Peter Lewis, Allen Goodman, James Miller,
-    #    A Pseudo-Random Number Generator for the System/360,
-    #    IBM Systems Journal,
-    #    Volume 8, Number 2, 1969, pages 136-143.
-    #
-    #  Parameters:
-    #
-    #    Input, integer N, the number of entries in the vector.
-    #
-    #    Input, integer SEED, a seed for the random number generator.
-    #
-    #    Output, real X(N), the vector of pseudorandom values.
-    #
-    #    Output, integer SEED, an updated seed for the random number generator.
-    #
-    import numpy as np
-    from sys import exit
-
-    i4_huge = 2147483647
-
-    seed = int(seed)
-
-    if (seed < 0):
-        seed = seed + i4_huge
-
-    if (seed == 0):
-        print('')
-        print('R8VEC_UNIFORM_01 - Fatal error!')
-        print('  Input SEED = 0!')
-        exit('R8VEC_UNIFORM_01 - Fatal error!')
-
-    x = np.zeros(n)
-
-    for i in range(0, n):
-
-        k = (seed // 127773)
-
-        seed = 16807 * (seed - k * 127773) - k * 2836
-
-        if (seed < 0):
-            seed = seed + i4_huge
-
-        x[i] = seed * 4.656612875E-10
-
-    return x, seed
-
-
-def r8vec_uniform_01_test():
-
-    # *****************************************************************************80
-    #
-    # R8VEC_UNIFORM_01_TEST tests R8VEC_UNIFORM_01.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    29 October 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    n = 10
-    seed = 123456789
-
-    print('')
-    print('R8VEC_UNIFORM_01_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8VEC_UNIFORM_01 computes a random R8VEC.')
-    print('')
-    print('  Initial seed is %d' % (seed))
-
-    v, seed = r8vec_uniform_01(n, seed)
-
-    r8vec_print(n, v, '  Random R8VEC:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8VEC_UNIFORM_01_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
 def timestamp():
 
     # *****************************************************************************80
@@ -1301,11 +1486,11 @@ def timestamp():
     return None
 
 
-def timestamp_test():
+def cube_monte_carlo_test():
 
     # *****************************************************************************80
     #
-    # TIMESTAMP_TEST tests TIMESTAMP.
+    # CUBE_MONTE_CARLO_TEST tests the CUBE_MONTE_CARLO library.
     #
     #  Licensing:
     #
@@ -1313,254 +1498,7 @@ def timestamp_test():
     #
     #  Modified:
     #
-    #    03 December 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    None
-    #
-    import platform
-
-    print('')
-    print('TIMESTAMP_TEST:')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  TIMESTAMP prints a timestamp of the current date and time.')
-    print('')
-
-    timestamp()
-#
-#  Terminate.
-#
-    print('')
-    print('TIMESTAMP_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def wedge01_monomial_integral(e):
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_MONOMIAL_INTEGRAL: integral of a monomial in the unit wedge in 3D.
-    #
-    #  Discussion:
-    #
-    #    This routine returns the integral of
-    #
-    #      product ( 1 <= I <= 3 ) X(I)^E(I)
-    #
-    #    over the unit wedge.
-    #
-    #    The integration region is:
-    #
-    #      0 <= X
-    #      0 <= Y
-    #      X + Y <= 1
-    #      -1 <= Z <= 1.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Reference:
-    #
-    #    Arthur Stroud,
-    #    Approximate Calculation of Multiple Integrals,
-    #    Prentice Hall, 1971,
-    #    ISBN: 0130438936,
-    #    LC: QA311.S85.
-    #
-    #  Parameters:
-    #
-    #    Input, integer E(3), the exponents.
-    #
-    #    Output, real VALUE, the integral of the monomial.
-    #
-    from sys import exit
-
-    value = 1.0
-
-    k = e[0]
-
-    for i in range(1, e[1] + 1):
-        k = k + 1
-        value = value * float(i) / float(k)
-
-    k = k + 1
-    value = value / float(k)
-
-    k = k + 1
-    value = value / float(k)
-#
-#  Now account for integration in Z.
-#
-    if (e[2] == - 1):
-        print('')
-        print('WEDGE01_MONOMIAL_INTEGRAL - Fatal error!')
-        print('  E(3) = -1 is not a legal input.')
-        exit('WEDGE01_MONOMIAL_INTEGRAL - Fatal error!')
-    elif ((e[2] % 2) == 1):
-        value = 0.0
-    else:
-        value = value * 2.0 / float(e[2] + 1)
-
-    return value
-
-
-def wedge01_monomial_integral_test():
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_MONOMIAL_INTEGRAL_TEST tests WEDGE01_MONOMIAL_INTEGRAL.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    m = 3
-    n = 500000
-    e_max = 6
-
-    print('')
-    print('WEDGE01_MONOMIAL_INTEGRAL_TEST:')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  WEDGE01_MONOMIAL_INTEGRAL computes the integral of a monomial')
-    print('  over the interior of the unit wedge in 3D.')
-    print('  Compare with a Monte Carlo estimate.')
-
-    seed = 123456789
-    x, seed = wedge01_sample(n, seed)
-
-    print('')
-    print('  Number of sample points used is %d' % (n))
-    print('')
-    print('   E1  E2  E3     MC-Estimate      Exact           Error')
-    print('')
-#
-#  Check all monomials up to total degree E_MAX.
-#
-    e = np.zeros(3, dtype=np.int32)
-
-    for e3 in range(0, e_max + 1):
-        e[2] = e3
-        for e2 in range(1, e_max - e3 + 1):
-            e[1] = e2
-            for e1 in range(0, e_max - e3 - e2 + 1):
-                e[0] = e1
-
-                value = monomial_value(m, n, e, x)
-
-                q = wedge01_volume() * np.sum(value) / float(n)
-                exact = wedge01_monomial_integral(e)
-                error = abs(q - exact)
-
-                print('  %2d  %2d  %2d  %14.6g  %14.6g  %14.6g'
-                      % (e[0], e[1], e[2], q, exact, error))
-#
-#  Terminate.
-#
-    print('')
-    print('WEDGE01_MONOMIAL_INTEGRAL_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def wedge01_sample(n, seed):
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_SAMPLE samples points uniformly from the unit wedge in 3D.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Reference:
-    #
-    #    Reuven Rubinstein,
-    #    Monte Carlo Optimization, Simulation, and Sensitivity
-    #    of Queueing Networks,
-    #    Krieger, 1992,
-    #    ISBN: 0894647644,
-    #    LC: QA298.R79.
-    #
-    #  Parameters:
-    #
-    #    Input, integer N, the number of points.
-    #
-    #    Input/output, integer SEED, a seed for the random
-    #    number generator.
-    #
-    #    Output, real X(3,N), the points.
-    #
-    import numpy as np
-
-    m = 3
-
-    x = np.zeros([m, n])
-
-    for j in range(0, n):
-
-        e, seed = r8vec_uniform_01(m + 1, seed)
-
-        el = np.zeros(m)
-
-        el_sum = 0.0
-        for i in range(0, m):
-            el[i] = - np.log(e[i])
-            el_sum = el_sum + el[i]
-
-        x[0, j] = el[0] / el_sum
-        x[1, j] = el[1] / el_sum
-        x[2, j] = 2.0 * e[3] - 1.0
-
-    return x, seed
-
-
-def wedge01_sample_test():
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_SAMPLE_TEST tests WEDGE01_SAMPLE.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
+    #    07 November 2016
     #
     #  Author:
     #
@@ -1569,139 +1507,27 @@ def wedge01_sample_test():
     import platform
 
     print('')
-    print('WEDGE01_SAMPLE_TEST')
+    print('CUBE_MONTE_CARLO_TEST')
     print('  Python version: %s' % (platform.python_version()))
-    print('  WEDGE01_SAMPLE samples the unit wedge.')
-
-    m = 3
-    n = 10
-    seed = 123456789
-
-    x, seed = wedge01_sample(n, seed)
-
-    r8mat_transpose_print(m, n, x, '  Sample points in the unit wedge.')
-#
-#  Terminate.
-#
+    print('  Test the CUBE_MONTE_CARLO library.')
+    #
+    #  Library functions.
+    #
+    cube01_monomial_integral_test()
+    cube01_monte_carlo_test()
+    cube01_sample_test()
+    cube01_volume_test()
+    monomial_value_test()
+    #
+    #  Terminate.
+    #
     print('')
-    print('WEDGE01_SAMPLE_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def wedge01_volume():
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_VOLUME returns the volume of the unit wedge in 3D.
-    #
-    #  Discussion:
-    #
-    #    The unit wedge is:
-    #
-    #      0 <= X
-    #      0 <= Y
-    #      X + Y <= 1
-    #      -1 <= Z <= 1.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Output, real VALUE, the volume of the unit wedge.
-    #
-    value = 1.0
-
-    return value
-
-
-def wedge01_volume_test():
-
-    # *****************************************************************************80
-    #
-    # WEDGE01_VOLUME_TEST tests WEDGE01_VOLUME.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    23 June 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import platform
-
-    print('')
-    print('WEDGE01_VOLUME_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  WEDGE01_VOLUME returns the volume of the unit wedge.')
-
-    value = wedge01_volume()
-
-    print('')
-    print('  WEDGE01_VOLUME() = %g' % (value))
-#
-#  Terminate.
-#
-    print('')
-    print('WEDGE01_VOLUME_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def wedge_monte_carlo_test():
-
-    # *****************************************************************************80
-    #
-    # WEDGE_MONTE_CARLO_TEST tests the WEDGE_MONTE_CARLO library.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    13 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import platform
-
-    print('')
-    print('WEDGE_MONTE_CARLO_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  Test the WEDGE_MONTE_CARLO library.')
-
-    wedge01_monomial_integral_test()
-    wedge01_monte_carlo_test()
-    wedge01_sample_test()
-    wedge01_volume_test()
-#
-#  Terminate.
-#
-    print('')
-    print('WEDGE_MONTE_CARLO_TEST')
+    print('CUBE_MONTE_CARLO_TEST:')
     print('  Normal end of execution.')
     return
 
 
 if (__name__ == '__main__'):
     timestamp()
-    wedge_monte_carlo_test()
+    cube_monte_carlo_test()
     timestamp()

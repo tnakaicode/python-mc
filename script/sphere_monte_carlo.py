@@ -6,22 +6,32 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join('./'))
+sys.path.append(os.path.join('../'))
 from base import plot2d, plot3d
-obj = plot2d()
 
-
-def ellipse_area1(a, r):
+def gamma_values(n_data):
 
     # *****************************************************************************80
     #
-    # ELLIPSE_AREA1 returns the area of an ellipse defined by a matrix.
+    # GAMMA_VALUES returns some values of the Gamma function.
     #
     #  Discussion:
     #
-    #    The points X in the ellipse are described by a 2 by 2
-    #    positive definite symmetric matrix A, and a "radius" R, such that
-    #      X' * A * X <= R * R
+    #    The Gamma function is defined as:
+    #
+    #      Gamma(Z) = Integral ( 0 <= T < Infinity) T^(Z-1) exp(-T) dT
+    #
+    #    It satisfies the recursion:
+    #
+    #      Gamma(X+1) = X * Gamma(X)
+    #
+    #    Gamma is undefined for nonpositive integral X.
+    #    Gamma(0.5) = sqrt(PI)
+    #    For N a positive integer, Gamma(N+1) = N!, the standard factorial.
+    #
+    #    In Mathematica, the function can be evaluated by:
+    #
+    #      Gamma[x]
     #
     #  Licensing:
     #
@@ -29,263 +39,7 @@ def ellipse_area1(a, r):
     #
     #  Modified:
     #
-    #    08 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, real A(2,2), the matrix that describes
-    #    the ellipsoid.  A must be symmetric and positive definite.
-    #
-    #    Input, real R, the "radius" of the ellipse.
-    #
-    #    Output, real VALUE, the area of the ellipse.
-    #
-    import numpy as np
-
-    value = r * r * np.pi / np.sqrt(a[0, 0] * a[1, 1] - a[1, 0] * a[0, 1])
-
-    return value
-
-
-def ellipse_area1_test():
-
-    # *****************************************************************************80
-    #
-    # ELLIPSE_AREA1_TEST tests ELLIPSE_AREA1.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    08 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    print('')
-    print('ELLIPSE_AREA1_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  ELLIPSE_AREA1 computes the area of an ellipse.')
-
-    r = 10.0
-    a = np.array([[5.0, 1.0], [1.0, 2.0]])
-    area = ellipse_area1(a, r)
-    print('')
-    print('  R = %g' % (r))
-    r8mat_print(2, 2, a, '  Matrix A in ellipse definition x*A*x=r^2')
-    print('  Area = %g' % (area))
-#
-#  Terminate.
-#
-    print('')
-    print('ELLIPSE_AREA1_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def ellipse_area2(a, b, c, d):
-
-    # *****************************************************************************80
-    #
-    # ELLIPSE_AREA2 returns the area of an ellipse defined by an equation.
-    #
-    #  Discussion:
-    #
-    #    The ellipse is described by the formula
-    #      a x^2 + b xy + c y^2 = d
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    08 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, real A, B, C, coefficients on the left hand side.
-    #
-    #    Input, real D, the right hand side.
-    #
-    #    Output, real VALUE, the area of the ellipse.
-    #
-    import numpy as np
-
-    value = 2.0 * d * d * np.pi / np.sqrt(4.0 * a * c - b * b)
-
-    return value
-
-
-def ellipse_area2_test():
-
-    # *****************************************************************************80
-    #
-    # ELLIPSE_AREA2_TEST tests ELLIPSE_AREA2.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    08 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    print('')
-    print('ELLIPSE_AREA2_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  ELLIPSE_AREA2 computes the area of an ellipse.')
-
-    a = 5.0
-    b = 2.0
-    c = 2.0
-    d = 10.0
-
-    area = ellipse_area2(a, b, c, d)
-    print('')
-    print('  Ellipse: %g * x^2 + %g * xy + %g * y^2 = %g' % (a, b, c, d))
-    print('  Area = %g' % (area))
-#
-#  Terminate.
-#
-    print('')
-    print('ELLIPSE_AREA2_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def ellipse_monte_carlo_test():
-
-    # *****************************************************************************80
-    #
-    # ELLIPSE_MONTE_CARLO_TEST uses ELLIPSE01_SAMPLE to estimate an integral.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    19 April 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-
-    a = np.array([
-        [9.0, 1.0],
-        [1.0, 4.0]])
-
-    e_test = np.array([
-        [0, 0],
-        [1, 0],
-        [0, 1],
-        [2, 0],
-        [1, 1],
-        [0, 2],
-        [3, 0]])
-
-    r = 2.0
-
-    print('')
-    print('ELLIPSE_MONTE_CARLO_TEST')
-    print('  Use ELLIPSE01_SAMPLE to estimate integrals')
-    print('  in the ellipse x'' * A * x <= r^2.')
-
-    obj.create_tempdir(-1)
-    seed = 123456789
-
-    print('')
-    txt = " \tN"
-    for e in e_test:
-        txt += "\tX^{:d} Y^{:d}".format(*e)
-    print(txt)
-    print('')
-
-    n = 1
-    while (n <= 65536):
-        x, seed = ellipse_sample(n, a, r, seed)
-        print('  %8d' % (n), end='')
-        for e in e_test:
-            value = monomial_value(2, n, e, x)
-            result = ellipse_area1(a, r) * np.sum(value[0:n]) / float(n)
-            print('\t%14.6g' % (result), end='')
-        print('')
-
-        obj.axs.scatter(*x, s=0.5)
-        obj.axs.set_title("n={:d}".format(n))
-        obj.axs.set_xlim(-0.25, 0.25)
-        obj.axs.set_ylim(-0.75, 0.75)
-        obj.SavePng_Serial(obj.rootname)
-        plt.close()
-        obj.new_fig()
-
-        n = 2 * n
-#
-#  Terminate.
-#
-    print('')
-    print('ELLIPSE_MONTE_CARLO_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def ellipse_sample(n, a, r, seed):
-
-    # *****************************************************************************80
-    #
-    # ELLIPSE_SAMPLE samples points in an ellipse.
-    #
-    #  Discussion:
-    #
-    #    The points X in the ellipse are described by a 2 by 2
-    #    positive definite symmetric matrix A, and a "radius" R, such that
-    #      X' * A * X <= R * R
-    #
-    #    If the ellipse is described by the formula
-    #      a x^2 + b xy + c y^2 = d
-    #    then
-    #      A = (  a  b/2 )
-    #          ( b/2  c  )
-    #      R = sqrt ( d )
-    #
-    #    The algorithm computes the Cholesky factorization of A:
-    #      A = U' * U.
-    #    A set of uniformly random points Y is generated, satisfying:
-    #      Y' * Y <= R * R.
-    #    The appropriate points in the ellipsoid are found by solving
-    #      U * X = Y
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    19 April 2014
+    #    25 July 2014
     #
     #  Author:
     #
@@ -293,53 +47,104 @@ def ellipse_sample(n, a, r, seed):
     #
     #  Reference:
     #
-    #    Reuven Rubinstein,
-    #    Monte Carlo Optimization, Simulation, and Sensitivity
-    #    of Queueing Networks,
-    #    Wiley, 1986.
+    #    Milton Abramowitz, Irene Stegun,
+    #    Handbook of Mathematical Functions,
+    #    US Department of Commerce, 1964.
+    #
+    #    Stephen Wolfram,
+    #    The Mathematica Book,
+    #    Fourth Edition,
+    #    Wolfram Media / Cambridge University Press, 1999.
     #
     #  Parameters:
     #
-    #    Input, integer N, the number of points.
+    #    Input/output, integer N_DATA.  The user sets N_DATA to 0 before the
+    #    first call.  On each call, the routine increments N_DATA by 1, and
+    #    returns the corresponding data when there is no more data, the
+    #    output value of N_DATA will be 0 again.
     #
-    #    Input, real A(2,2), the matrix that describes the ellipse.
+    #    Output, real X, the argument of the function.
     #
-    #    Input, real R, the right hand side of the ellipse equation.
-    #
-    #    Input/output, integer SEED, a seed for the random number generator.
-    #
-    #    Output, real X(2,N), the points.
+    #    Output, real FX, the value of the function.
     #
     import numpy as np
-#
-#  Get the factor U such that U' * U = A.
-#
-    u_fa = r8po_fa(2, a)
-#
-#  Get the points Y that satisfy Y' * Y = R * R.
-#
-    x, seed = uniform_in_sphere01_map(2, n, seed)
 
-    x = r * x
-#
-#  Solve U * X = Y.
-#
-    s = np.zeros(2)
-    t = np.zeros(2)
+    n_max = 25
 
-    for j in range(0, n):
-        t[0:2] = x[0:2, j]
-        s[0:2] = r8po_sl(2, u_fa, t)
-        x[0:2, j] = s[0:2]
+    fx_vec = np.array((
+        -0.3544907701811032E+01,
+        -0.1005871979644108E+03,
+        0.9943258511915060E+02,
+        0.9513507698668732E+01,
+        0.4590843711998803E+01,
+        0.2218159543757688E+01,
+        0.1772453850905516E+01,
+        0.1489192248812817E+01,
+        0.1164229713725303E+01,
+        0.1000000000000000E+01,
+        0.9513507698668732E+00,
+        0.9181687423997606E+00,
+        0.8974706963062772E+00,
+        0.8872638175030753E+00,
+        0.8862269254527580E+00,
+        0.8935153492876903E+00,
+        0.9086387328532904E+00,
+        0.9313837709802427E+00,
+        0.9617658319073874E+00,
+        0.1000000000000000E+01,
+        0.2000000000000000E+01,
+        0.6000000000000000E+01,
+        0.3628800000000000E+06,
+        0.1216451004088320E+18,
+        0.8841761993739702E+31))
 
-    return x, seed
+    x_vec = np.array((
+        -0.50E+00,
+        -0.01E+00,
+        0.01E+00,
+        0.10E+00,
+        0.20E+00,
+        0.40E+00,
+        0.50E+00,
+        0.60E+00,
+        0.80E+00,
+        1.00E+00,
+        1.10E+00,
+        1.20E+00,
+        1.30E+00,
+        1.40E+00,
+        1.50E+00,
+        1.60E+00,
+        1.70E+00,
+        1.80E+00,
+        1.90E+00,
+        2.00E+00,
+        3.00E+00,
+        4.00E+00,
+        10.00E+00,
+        20.00E+00,
+        30.00E+00))
+
+    if (n_data < 0):
+        n_data = 0
+
+    if (n_max <= n_data):
+        n_data = 0
+        x = 0.0
+        fx = 0.0
+    else:
+        x = x_vec[n_data]
+        fx = fx_vec[n_data]
+        n_data = n_data + 1
+
+    return n_data, x, fx
 
 
-def ellipse_sample_test():
+def gamma_values_test():
 
     # *****************************************************************************80
     #
-    # ELLIPSE_SAMPLE_TEST tests ELLIPSE_SAMPLE.
+    # GAMMA_VALUE_TEST demonstrates the use of GAMMA_VALUES.
     #
     #  Licensing:
     #
@@ -347,34 +152,37 @@ def ellipse_sample_test():
     #
     #  Modified:
     #
-    #    08 November 2016
+    #    02 February 2009
     #
     #  Author:
     #
     #    John Burkardt
     #
-    import numpy as np
     import platform
 
     print('')
-    print('ELLIPSE_SAMPLE_TEST')
+    print('GAMMA_VALUES_TEST:')
     print('  Python version: %s' % (platform.python_version()))
-    print('  ELLIPSE_SAMPLE computes points uniformly distributed')
-    print('  inside an ellipse x\'*A*x=r^2.')
+    print('  GAMMA_VALUES stores values of the Gamma function.')
+    print('')
+    print('      X            GAMMA(X)')
+    print('')
 
-    n = 10
-    a = np.array([[5.0, 1.0], [1.0, 2.0]])
-    r = 10.0
-    seed = 123456789
+    n_data = 0
 
-    x, seed = ellipse_sample(n, a, r, seed)
+    while (True):
 
-    r8mat_transpose_print(2, n, x, '  Random points inside ellipse')
+        n_data, x, fx = gamma_values(n_data)
+
+        if (n_data == 0):
+            break
+
+        print('  %12f  %24.16f' % (x, fx))
 #
 #  Terminate.
 #
     print('')
-    print('ELLIPSE_SAMPLE_TEST')
+    print('GAMMA_VALUES_TEST:')
     print('  Normal end of execution.')
     return
 
@@ -495,7 +303,7 @@ def i4vec_transpose_print(n, a, title):
 
     if (0 < n):
         for i in range(0, n):
-            print('%8d' % (a[i]), end='')
+            print('%8d' % (a[i])),
             if ((i + 1) % 10 == 0 or i == n - 1):
                 print('')
     else:
@@ -806,21 +614,289 @@ def monomial_value_test():
         v = monomial_value(m, n, e, x)
 
         print('')
-        print('   V(X)         ', end='')
+        print('   V(X)         '),
         for i in range(0, m):
-            print('      X(%d)' % (i), end='')
+            print('      X(%d)' % (i)),
         print('')
         print('')
         for j in range(0, n):
-            print('%14.6g  ' % (v[j]), end='')
+            print('%14.6g  ' % (v[j])),
             for i in range(0, m):
-                print('%10.4f' % (x[i, j]), end='')
+                print('%10.4f' % (x[i, j])),
             print('')
 #
 #  Terminate.
 #
     print('')
     print('MONOMIAL_VALUE_TEST')
+    print('  Normal end of execution.')
+    return
+
+
+def r8_gamma(x):
+
+    # *****************************************************************************80
+    #
+    # R8_GAMMA evaluates Gamma(X) for a real argument.
+    #
+    #  Discussion:
+    #
+    #    This routine calculates the gamma function for a real argument X.
+    #
+    #    Computation is based on an algorithm outlined in reference 1.
+    #    The program uses rational functions that approximate the gamma
+    #    function to at least 20 significant decimal digits.  Coefficients
+    #    for the approximation over the interval (1,2) are unpublished.
+    #    Those for the approximation for 12 <= X are from reference 2.
+    #
+    #    PYTHON provides a GAMMA function, which is likely to be faster, and more
+    #    accurate.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    24 July 2014
+    #
+    #  Author:
+    #
+    #    Original FORTRAN77 version by William Cody, Laura Stoltz.
+    #    PYTHON version by John Burkardt.
+    #
+    #  Reference:
+    #
+    #    William Cody,
+    #    An Overview of Software Development for Special Functions,
+    #    in Numerical Analysis Dundee, 1975,
+    #    edited by GA Watson,
+    #    Lecture Notes in Mathematics 506,
+    #    Springer, 1976.
+    #
+    #    John Hart, Ward Cheney, Charles Lawson, Hans Maehly,
+    #    Charles Mesztenyi, John Rice, Henry Thatcher,
+    #    Christoph Witzgall,
+    #    Computer Approximations,
+    #    Wiley, 1968,
+    #    LC: QA297.C64.
+    #
+    #  Parameters:
+    #
+    #    Input, real X, the argument of the function.
+    #
+    #    Output, real VALUE, the value of the function.
+    #
+    import numpy as np
+#
+#  Coefficients for minimax approximation over (12, INF).
+#
+    c = np.array([
+        -1.910444077728E-03,
+        8.4171387781295E-04,
+        -5.952379913043012E-04,
+        7.93650793500350248E-04,
+        -2.777777777777681622553E-03,
+        8.333333333333333331554247E-02,
+        5.7083835261E-03])
+#
+#  Mathematical constants
+#
+    sqrtpi = 0.9189385332046727417803297
+#
+#  Machine dependent parameters
+#
+    xbig = 171.624
+    xminin = 2.23E-308
+    eps = 2.22E-16
+    xinf = 1.79E+308
+#
+#  Numerator and denominator coefficients for rational minimax
+#  approximation over (1,2).
+#
+    p = np.array([
+        -1.71618513886549492533811E+00,
+        2.47656508055759199108314E+01,
+        -3.79804256470945635097577E+02,
+        6.29331155312818442661052E+02,
+        8.66966202790413211295064E+02,
+        -3.14512729688483675254357E+04,
+        -3.61444134186911729807069E+04,
+        6.64561438202405440627855E+04])
+
+    q = np.array([
+        -3.08402300119738975254353E+01,
+        3.15350626979604161529144E+02,
+        -1.01515636749021914166146E+03,
+        -3.10777167157231109440444E+03,
+        2.25381184209801510330112E+04,
+        4.75584627752788110767815E+03,
+        -1.34659959864969306392456E+05,
+        -1.15132259675553483497211E+05])
+
+    parity = 0
+    fact = 1.0
+    n = 0
+    y = x
+#
+#  Argument is negative.
+#
+    if (y <= 0.0):
+
+        y = - x
+        y1 = int(y)
+        res = y - y1
+
+        if (res != 0.0):
+
+            if (y1 != int(y1 * 0.5) * 2.0):
+                parity = 1
+
+            fact = - np.pi / np.sin(np.pi * res)
+            y = y + 1.0
+
+        else:
+
+            res = xinf
+            value = res
+            return value
+#
+#  Argument is positive.
+#
+    if (y < eps):
+        #
+        #  Argument < EPS.
+        #
+        if (xminin <= y):
+            res = 1.0 / y
+        else:
+            res = xinf
+
+        value = res
+        return value
+
+    elif (y < 12.0):
+
+        y1 = y
+#
+#  0.0 < argument < 1.0.
+#
+        if (y < 1.0):
+
+            z = y
+            y = y + 1.0
+#
+#  1.0 < argument < 12.0.
+#  Reduce argument if necessary.
+#
+        else:
+
+            n = int(y - 1)
+            y = y - n
+            z = y - 1.0
+#
+#  Evaluate approximation for 1.0 < argument < 2.0.
+#
+        xnum = 0.0
+        xden = 1.0
+        for i in range(0, 8):
+            xnum = (xnum + p[i]) * z
+            xden = xden * z + q[i]
+
+        res = xnum / xden + 1.0
+#
+#  Adjust result for case  0.0 < argument < 1.0.
+#
+        if (y1 < y):
+
+            res = res / y1
+#
+#  Adjust result for case 2.0 < argument < 12.0.
+#
+        elif (y < y1):
+
+            for i in range(0, n):
+                res = res * y
+                y = y + 1.0
+
+    else:
+        #
+        #  Evaluate for 12.0 <= argument.
+        #
+        if (y <= xbig):
+
+            ysq = y * y
+            sum = c[6]
+            for i in range(0, 6):
+                sum = sum / ysq + c[i]
+            sum = sum / y - y + sqrtpi
+            sum = sum + (y - 0.5) * np.log(y)
+            res = np.exp(sum)
+
+        else:
+
+            res = xinf
+            value = res
+            return value
+#
+#  Final adjustments and return.
+#
+    if (parity):
+        res = - res
+
+    if (fact != 1.0):
+        res = fact / res
+
+    value = res
+
+    return value
+
+
+def r8_gamma_test():
+
+    # *****************************************************************************80
+    #
+    # R8_GAMMA_TEST demonstrates the use of R8_GAMMA.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    25 July 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import platform
+
+    print('')
+    print('R8_GAMMA_TEST:')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  R8_GAMMA evaluates the Gamma function.')
+    print('')
+    print('      X            GAMMA(X)      R8_GAMMA(X)')
+    print('')
+
+    n_data = 0
+
+    while (True):
+
+        n_data, x, fx1 = gamma_values(n_data)
+
+        if (n_data == 0):
+            break
+
+        fx2 = r8_gamma(x)
+
+        print('  %12g  %24.16g  %24.16g' % (x, fx1, fx2))
+#
+#  Terminate.
+#
+    print('')
+    print('R8_GAMMA_TEST')
     print('  Normal end of execution.')
     return
 
@@ -948,10 +1024,10 @@ def r8mat_print_some(m, n, a, ilo, jlo, ihi, jhi, title):
         j2hi = min(j2hi, jhi)
 
         print('')
-        print('  Col: ', end='')
+        print('  Col: '),
 
         for j in range(j2lo, j2hi + 1):
-            print('%7d       ' % (j), end='')
+            print('%7d       ' % (j)),
 
         print('')
         print('  Row')
@@ -961,10 +1037,10 @@ def r8mat_print_some(m, n, a, ilo, jlo, ihi, jhi, title):
 
         for i in range(i2lo, i2hi + 1):
 
-            print('%7d :' % (i), end='')
+            print('%7d :' % (i)),
 
             for j in range(j2lo, j2hi + 1):
-                print('%12g  ' % (a[i, j]), end='')
+                print('%12g  ' % (a[i, j])),
 
             print('')
 
@@ -1137,10 +1213,10 @@ def r8mat_transpose_print_some(m, n, a, ilo, jlo, ihi, jhi, title):
         i2hi = min(i2hi, ihi)
 
         print('')
-        print('  Row: ', end='')
+        print('  Row: '),
 
         for i in range(i2lo, i2hi + 1):
-            print('%7d       ' % (i), end='')
+            print('%7d       ' % (i)),
 
         print('')
         print('  Col')
@@ -1150,10 +1226,10 @@ def r8mat_transpose_print_some(m, n, a, ilo, jlo, ihi, jhi, title):
 
         for j in range(j2lo, j2hi + 1):
 
-            print('%7d :' % (j), end='')
+            print('%7d :' % (j)),
 
             for i in range(i2lo, i2hi + 1):
-                print('%12g  ' % (a[i, j]), end='')
+                print('%12g  ' % (a[i, j])),
 
             print('')
 
@@ -1200,6 +1276,153 @@ def r8mat_transpose_print_some_test():
 #
     print('')
     print('R8MAT_TRANSPOSE_PRINT_SOME_TEST:')
+    print('  Normal end of execution.')
+    return
+
+
+def r8mat_uniform_ab(m, n, a, b, seed):
+
+    # *****************************************************************************80
+    #
+    # R8MAT_UNIFORM_AB returns a scaled pseudorandom R8MAT.
+    #
+    #  Discussion:
+    #
+    #    An R8MAT is an array of R8's.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    08 April 2013
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Paul Bratley, Bennett Fox, Linus Schrage,
+    #    A Guide to Simulation,
+    #    Second Edition,
+    #    Springer, 1987,
+    #    ISBN: 0387964673,
+    #    LC: QA76.9.C65.B73.
+    #
+    #    Bennett Fox,
+    #    Algorithm 647:
+    #    Implementation and Relative Efficiency of Quasirandom
+    #    Sequence Generators,
+    #    ACM Transactions on Mathematical Software,
+    #    Volume 12, Number 4, December 1986, pages 362-376.
+    #
+    #    Pierre L'Ecuyer,
+    #    Random Number Generation,
+    #    in Handbook of Simulation,
+    #    edited by Jerry Banks,
+    #    Wiley, 1998,
+    #    ISBN: 0471134031,
+    #    LC: T57.62.H37.
+    #
+    #    Peter Lewis, Allen Goodman, James Miller,
+    #    A Pseudo-Random Number Generator for the System/360,
+    #    IBM Systems Journal,
+    #    Volume 8, Number 2, 1969, pages 136-143.
+    #
+    #  Parameters:
+    #
+    #    Input, integer M, N, the number of rows and columns in the array.
+    #
+    #    Input, real A, B, the range of the pseudorandom values.
+    #
+    #    Input, integer SEED, the integer "seed" used to generate
+    #    the output random number.
+    #
+    #    Output, real R(M,N), an array of random values between 0 and 1.
+    #
+    #    Output, integer SEED, the updated seed.  This would
+    #    normally be used as the input seed on the next call.
+    #
+    import numpy
+    from sys import exit
+
+    i4_huge = 2147483647
+
+    seed = int(seed)
+
+    if (seed < 0):
+        seed = seed + i4_huge
+
+    if (seed == 0):
+        print('')
+        print('R8MAT_UNIFORM_AB - Fatal error!')
+        print('  Input SEED = 0!')
+        exit('R8MAT_UNIFORM_AB - Fatal error!')
+
+    r = numpy.zeros([m, n])
+
+    for j in range(0, n):
+        for i in range(0, m):
+
+            k = (seed // 127773)
+
+            seed = 16807 * (seed - k * 127773) - k * 2836
+
+            seed = (seed % i4_huge)
+
+            if (seed < 0):
+                seed = seed + i4_huge
+
+            r[i, j] = a + (b - a) * seed * 4.656612875E-10
+
+    return r, seed
+
+
+def r8mat_uniform_ab_test():
+
+    # *****************************************************************************80
+    #
+    # R8MAT_UNIFORM_AB_TEST tests R8MAT_UNIFORM_AB.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    31 October 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+    import platform
+
+    m = 5
+    n = 4
+    a = -1.0
+    b = +5.0
+    seed = 123456789
+
+    print('')
+    print('R8MAT_UNIFORM_AB_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  R8MAT_UNIFORM_AB computes a random R8MAT.')
+    print('')
+    print('  %g <= X <= %g' % (a, b))
+    print('  Initial seed is %d' % (seed))
+
+    v, seed = r8mat_uniform_ab(m, n, a, b, seed)
+
+    r8mat_print(m, n, v, '  Random R8MAT:')
+#
+#  Terminate.
+#
+    print('')
+    print('R8MAT_UNIFORM_AB_TEST:')
     print('  Normal end of execution.')
     return
 
@@ -1287,309 +1510,6 @@ def r8_normal_01_test():
 #
     print('')
     print('R8_NORMAL_01_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def r8po_fa(n, a):
-
-    # *****************************************************************************80
-    #
-    # R8PO_FA factors a R8PO matrix.
-    #
-    #  Discussion:
-    #
-    #    The R8PO storage format is appropriate for a symmetric positive definite
-    #    matrix and its inverse.  (The Cholesky factor of a R8PO matrix is an
-    #    upper triangular matrix, so it will be in R8GE storage format.)
-    #
-    #    Only the diagonal and upper triangle of the square array are used.
-    #    This same storage scheme is used when the matrix is factored by
-    #    R8PO_FA, or inverted by R8PO_INVERSE.  For clarity, the lower triangle
-    #    is set to zero.
-    #
-    #    The positive definite symmetric matrix A has a Cholesky factorization
-    #    of the form:
-    #
-    #      A = R' * R
-    #
-    #    where R is an upper triangular matrix with positive elements on
-    #    its diagonal.  This routine overwrites the matrix A with its
-    #    factor R.
-    #
-    #    This function failed miserably when I wrote "r = a", because of a
-    #    disastrously misconceived feature of Python, which does not copy
-    #    one matrix to another, but makes them both point to the same object.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    03 August 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt.
-    #
-    #  Reference:
-    #
-    #    Dongarra, Bunch, Moler, Stewart,
-    #    LINPACK User's Guide,
-    #    SIAM, 1979.
-    #
-    #  Parameters:
-    #
-    #    Input, integer N, the order of the matrix.
-    #
-    #    Input, real A(N,N), the matrix in R8PO storage.
-    #
-    #    Output, real R(N,N), the Cholesky factor R in R8GE storage.
-    #
-    #    Output, integer INFO, error flag.
-    #    0, normal return.
-    #    K, error condition.  The principal minor of order K is not
-    #    positive definite, and the factorization was not completed.
-    #
-    import numpy as np
-    from sys import exit
-
-    r = np.zeros([n, n])
-
-    for i in range(0, n):
-        for j in range(i, n):
-            r[i, j] = a[i, j]
-
-    for j in range(0, n):
-
-        for k in range(0, j):
-            t = 0.0
-            for i in range(0, k):
-                t = t + r[i, k] * r[i, j]
-            r[k, j] = (r[k, j] - t) / r[k, k]
-
-        t = 0.0
-        for i in range(0, j):
-            t = t + r[i, j] ** 2
-
-        s = r[j, j] - t
-
-        if (s <= 0.0):
-            print('')
-            print('R8PO_FA - Fatal error!')
-            print('  Factorization fails on column %d.' % (j))
-            exit('R8PO_FA - Fatal error!')
-
-        r[j, j] = np.sqrt(s)
-#
-#  Since the Cholesky factor is stored in R8GE format, be sure to
-#  zero out the lower triangle.
-#
-    for i in range(0, n):
-        for j in range(0, i):
-            r[i, j] = 0.0
-
-    return r
-
-
-def r8po_fa_test():
-
-    # *****************************************************************************80
-    #
-    # R8PO_FA_TEST tests R8PO_FA;
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    29 July 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    n = 5
-
-    print('')
-    print('R8PO_FA_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8PO_FA factors a positive definite symmetric')
-    print('  linear system,')
-    print('')
-    print('  Matrix order N = %d' % (n))
-
-    a = np.zeros([n, n])
-
-    for i in range(0, n):
-        for j in range(0, n):
-            a[i, j] = min(i, j) + 1
-
-    r8mat_print(n, n, a, '  The matrix A:')
-#
-#  Factor the matrix.
-#
-    r = r8po_fa(n, a)
-
-    r8mat_print(n, n, r, '  The factor R (a R8UT matrix):')
-#
-#  Compute the product R' * R.
-#
-    rtr = np.zeros([n, n])
-
-    for i in range(0, n):
-        for j in range(0, n):
-            k_hi = min(i + 1, j + 1)
-            for k in range(0, k_hi):
-                rtr[i, j] = rtr[i, j] + r[k, i] * r[k, j]
-
-    r8mat_print(n, n, rtr, '  The product R\' * R:')
-#
-#  Terminate
-#
-    print('')
-    print('R8PO_FA_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def r8po_sl(n, r, b):
-
-    # *****************************************************************************80
-    #
-    # R8PO_SL solves a R8PO system factored by R8PO_FA.
-    #
-    #  Discussion:
-    #
-    #    The R8PO storage format is appropriate for a symmetric positive definite
-    #    matrix and its inverse.  (The Cholesky factor of a R8PO matrix is an
-    #    upper triangular matrix, so it will be in R8GE storage format.)
-    #
-    #    Only the diagonal and upper triangle of the square array are used.
-    #    This same storage scheme is used when the matrix is factored by
-    #    R8PO_FA, or inverted by R8PO_INVERSE.  For clarity, the lower triangle
-    #    is set to zero.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    02 August 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt.
-    #
-    #  Reference:
-    #
-    #    Dongarra, Bunch, Moler, Stewart,
-    #    LINPACK User's Guide,
-    #    SIAM, 1979.
-    #
-    #  Parameters:
-    #
-    #    Input, integer N, the order of the matrix.
-    #
-    #    Input, real R(N,N), the Cholesky factor, in R8GE storage,
-    #    returned by R8PO_FA.
-    #
-    #    Input, real B(N), the right hand side.
-    #
-    #    Output, real X(N), the solution vector.
-    #
-    import numpy as np
-
-    x = np.zeros(n)
-
-    for i in range(0, n):
-        x[i] = b[i]
-#
-#  Solve R' * y = b.
-#
-    for k in range(0, n):
-        t = 0.0
-        for i in range(0, k):
-            t = t + x[i] * r[i, k]
-        x[k] = (x[k] - t) / r[k, k]
-#
-#  Solve R * x = y.
-#
-    for k in range(n - 1, -1, -1):
-        x[k] = x[k] / r[k, k]
-        for i in range(0, k):
-            x[i] = x[i] - r[i, k] * x[k]
-
-    return x
-
-
-def r8po_sl_test():
-
-    # *****************************************************************************80
-    #
-    # R8PO_SL_TEST tests R8PO_SL.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    02 August 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    n = 5
-
-    print('')
-    print('R8PO_SL_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8PO_SL solves a linear system with an R8PO matrix')
-    print('  after it has been factored by R8PO_FA.')
-    print('')
-    print('  Matrix order N = %d' % (n))
-#
-#  Set (the upper half of) matrix A.
-#
-    a = np.zeros([n, n])
-
-    for i in range(0, n):
-        a[i, i] = 2.0
-    for i in range(0, n - 1):
-        a[i, i + 1] = -1.0
-
-    r8mat_print(n, n, a, '  Matrix A:')
-#
-#  Factor the matrix.
-#
-    r = r8po_fa(n, a)
-#
-#  Set the right hand side.
-#
-    b = np.zeros(n)
-    b[n - 1] = float(n + 1)
-    r8vec_print(n, b, '  Right hand side b:')
-#
-#  Solve the linear system.
-#
-    x = r8po_sl(n, r, b)
-    r8vec_print(n, x, '  Solution x:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8PO_SL_TEST')
     print('  Normal end of execution.')
     return
 
@@ -1760,204 +1680,17 @@ def r8_uniform_01_test():
     return
 
 
-def r8mat_print(m, n, a, title):
+def r8vec_norm(n, a):
 
     # *****************************************************************************80
     #
-    # R8MAT_PRINT prints an R8MAT.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    31 August 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, integer M, the number of rows in A.
-    #
-    #    Input, integer N, the number of columns in A.
-    #
-    #    Input, real A(M,N), the matrix.
-    #
-    #    Input, string TITLE, a title.
-    #
-    r8mat_print_some(m, n, a, 0, 0, m - 1, n - 1, title)
-
-    return
-
-
-def r8mat_print_test():
-
-    # *****************************************************************************80
-    #
-    # R8MAT_PRINT_TEST tests R8MAT_PRINT.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    10 February 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    print('')
-    print('R8MAT_PRINT_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8MAT_PRINT prints an R8MAT.')
-
-    m = 4
-    n = 6
-    v = np.array([
-        [11.0, 12.0, 13.0, 14.0, 15.0, 16.0],
-        [21.0, 22.0, 23.0, 24.0, 25.0, 26.0],
-        [31.0, 32.0, 33.0, 34.0, 35.0, 36.0],
-        [41.0, 42.0, 43.0, 44.0, 45.0, 46.0]], dtype=np.float64)
-    r8mat_print(m, n, v, '  Here is an R8MAT:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8MAT_PRINT_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def r8mat_print_some(m, n, a, ilo, jlo, ihi, jhi, title):
-
-    # *****************************************************************************80
-    #
-    # R8MAT_PRINT_SOME prints out a portion of an R8MAT.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    10 February 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, integer M, N, the number of rows and columns of the matrix.
-    #
-    #    Input, real A(M,N), an M by N matrix to be printed.
-    #
-    #    Input, integer ILO, JLO, the first row and column to print.
-    #
-    #    Input, integer IHI, JHI, the last row and column to print.
-    #
-    #    Input, string TITLE, a title.
-    #
-    incx = 5
-
-    print('')
-    print(title)
-
-    if (m <= 0 or n <= 0):
-        print('')
-        print('  (None)')
-        return
-
-    for j2lo in range(max(jlo, 0), min(jhi + 1, n), incx):
-
-        j2hi = j2lo + incx - 1
-        j2hi = min(j2hi, n)
-        j2hi = min(j2hi, jhi)
-
-        print('')
-        print('  Col: ', end='')
-
-        for j in range(j2lo, j2hi + 1):
-            print('%7d       ' % (j), end='')
-
-        print('')
-        print('  Row')
-
-        i2lo = max(ilo, 0)
-        i2hi = min(ihi, m)
-
-        for i in range(i2lo, i2hi + 1):
-
-            print('%7d :' % (i), end='')
-
-            for j in range(j2lo, j2hi + 1):
-                print('%12g  ' % (a[i, j]), end='')
-
-            print('')
-
-    return
-
-
-def r8mat_print_some_test():
-
-    # *****************************************************************************80
-    #
-    # R8MAT_PRINT_SOME_TEST tests R8MAT_PRINT_SOME.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    31 October 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    print('')
-    print('R8MAT_PRINT_SOME_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8MAT_PRINT_SOME prints some of an R8MAT.')
-
-    m = 4
-    n = 6
-    v = np.array([
-        [11.0, 12.0, 13.0, 14.0, 15.0, 16.0],
-        [21.0, 22.0, 23.0, 24.0, 25.0, 26.0],
-        [31.0, 32.0, 33.0, 34.0, 35.0, 36.0],
-        [41.0, 42.0, 43.0, 44.0, 45.0, 46.0]], dtype=np.float64)
-    r8mat_print_some(m, n, v, 0, 3, 2, 5, '  Here is an R8MAT:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8MAT_PRINT_SOME_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def r8mat_uniform_ab(m, n, a, b, seed):
-
-    # *****************************************************************************80
-    #
-    # R8MAT_UNIFORM_AB returns a scaled pseudorandom R8MAT.
+    # R8VEC_NORM returns the L2 norm of an R8VEC.
     #
     #  Discussion:
     #
-    #    An R8MAT is an array of R8's.
+    #    The vector L2 norm is defined as:
+    #
+    #      value = sqrt ( sum ( 1 <= I <= N ) A(I)^2 ).
     #
     #  Licensing:
     #
@@ -1965,95 +1698,35 @@ def r8mat_uniform_ab(m, n, a, b, seed):
     #
     #  Modified:
     #
-    #    08 April 2013
+    #    02 January 2015
     #
     #  Author:
     #
     #    John Burkardt
-    #
-    #  Reference:
-    #
-    #    Paul Bratley, Bennett Fox, Linus Schrage,
-    #    A Guide to Simulation,
-    #    Second Edition,
-    #    Springer, 1987,
-    #    ISBN: 0387964673,
-    #    LC: QA76.9.C65.B73.
-    #
-    #    Bennett Fox,
-    #    Algorithm 647:
-    #    Implementation and Relative Efficiency of Quasirandom
-    #    Sequence Generators,
-    #    ACM Transactions on Mathematical Software,
-    #    Volume 12, Number 4, December 1986, pages 362-376.
-    #
-    #    Pierre L'Ecuyer,
-    #    Random Number Generation,
-    #    in Handbook of Simulation,
-    #    edited by Jerry Banks,
-    #    Wiley, 1998,
-    #    ISBN: 0471134031,
-    #    LC: T57.62.H37.
-    #
-    #    Peter Lewis, Allen Goodman, James Miller,
-    #    A Pseudo-Random Number Generator for the System/360,
-    #    IBM Systems Journal,
-    #    Volume 8, Number 2, 1969, pages 136-143.
     #
     #  Parameters:
     #
-    #    Input, integer M, N, the number of rows and columns in the array.
+    #    Input, integer N, the number of entries in A.
     #
-    #    Input, real A, B, the range of the pseudorandom values.
+    #    Input, real A(N), the vector whose L2 norm is desired.
     #
-    #    Input, integer SEED, the integer "seed" used to generate
-    #    the output random number.
+    #    Output, real VALUE, the L2 norm of A.
     #
-    #    Output, real R(M,N), an array of random values between 0 and 1.
-    #
-    #    Output, integer SEED, the updated seed.  This would
-    #    normally be used as the input seed on the next call.
-    #
-    import numpy
-    from sys import exit
+    import numpy as np
 
-    i4_huge = 2147483647
+    value = 0.0
+    for i in range(0, n):
+        value = value + a[i] * a[i]
+    value = np.sqrt(value)
 
-    seed = int(seed)
-
-    if (seed < 0):
-        seed = seed + i4_huge
-
-    if (seed == 0):
-        print('')
-        print('R8MAT_UNIFORM_AB - Fatal error!')
-        print('  Input SEED = 0!')
-        exit('R8MAT_UNIFORM_AB - Fatal error!')
-
-    r = numpy.zeros([m, n])
-
-    for j in range(0, n):
-        for i in range(0, m):
-
-            k = (seed // 127773)
-
-            seed = 16807 * (seed - k * 127773) - k * 2836
-
-            seed = (seed % i4_huge)
-
-            if (seed < 0):
-                seed = seed + i4_huge
-
-            r[i, j] = a + (b - a) * seed * 4.656612875E-10
-
-    return r, seed
+    return value
 
 
-def r8mat_uniform_ab_test():
+def r8vec_norm_test():
 
     # *****************************************************************************80
     #
-    # R8MAT_UNIFORM_AB_TEST tests R8MAT_UNIFORM_AB.
+    # R8VEC_NORM_TEST tests R8VEC_NORM.
     #
     #  Licensing:
     #
@@ -2061,38 +1734,32 @@ def r8mat_uniform_ab_test():
     #
     #  Modified:
     #
-    #    31 October 2014
+    #    22 June 2015
     #
     #  Author:
     #
     #    John Burkardt
     #
-    import numpy as np
     import platform
-    from r8mat_print import r8mat_print
-
-    m = 5
-    n = 4
-    a = -1.0
-    b = +5.0
-    seed = 123456789
 
     print('')
-    print('R8MAT_UNIFORM_AB_TEST')
+    print('R8VEC_NORM_TEST')
     print('  Python version: %s' % (platform.python_version()))
-    print('  R8MAT_UNIFORM_AB computes a random R8MAT.')
+    print('  R8VEC_NORM computes the L2 norm of an R8VEC.')
+
+    n = 10
+    seed = 123456789
+    a, seed = r8vec_uniform_01(n, seed)
+    r8vec_print(n, a, '  Input vector:')
+    a_norm = r8vec_norm(n, a)
+
     print('')
-    print('  %g <= X <= %g' % (a, b))
-    print('  Initial seed is %d' % (seed))
-
-    v, seed = r8mat_uniform_ab(m, n, a, b, seed)
-
-    r8mat_print(m, n, v, '  Random R8MAT:')
+    print('  L2 norm = %g' % (a_norm))
 #
 #  Terminate.
 #
     print('')
-    print('R8MAT_UNIFORM_AB_TEST:')
+    print('R8VEC_NORM_TEST:')
     print('  Normal end of execution.')
     return
 
@@ -2381,6 +2048,522 @@ def r8vec_uniform_01_test():
     return
 
 
+def r8vec_uniform_ab(n, a, b, seed):
+
+    # *****************************************************************************80
+    #
+    # R8VEC_UNIFORM_AB returns a scaled pseudorandom R8VEC.
+    #
+    #  Discussion:
+    #
+    #    Each dimension ranges from A to B.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    29 October 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Paul Bratley, Bennett Fox, Linus Schrage,
+    #    A Guide to Simulation,
+    #    Springer Verlag, pages 201-202, 1983.
+    #
+    #    Bennett Fox,
+    #    Algorithm 647:
+    #    Implementation and Relative Efficiency of Quasirandom
+    #    Sequence Generators,
+    #    ACM Transactions on Mathematical Software,
+    #    Volume 12, Number 4, pages 362-376, 1986.
+    #
+    #    Peter Lewis, Allen Goodman, James Miller,
+    #    A Pseudo-Random Number Generator for the System/360,
+    #    IBM Systems Journal,
+    #    Volume 8, pages 136-143, 1969.
+    #
+    #  Parameters:
+    #
+    #    Input, integer N, the number of entries in the vector.
+    #
+    #    Input, real A, B, the range of the pseudorandom values.
+    #
+    #    Input, integer SEED, a seed for the random number generator.
+    #
+    #    Output, real X(N), the vector of pseudorandom values.
+    #
+    #    Output, integer SEED, an updated seed for the random number generator.
+    #
+    import numpy
+    from sys import exit
+
+    i4_huge = 2147483647
+
+    seed = int(seed)
+
+    if (seed < 0):
+        seed = seed + i4_huge
+
+    if (seed == 0):
+        print('')
+        print('R8VEC_UNIFORM_AB - Fatal error!')
+        print('  Input SEED = 0!')
+        exit('R8VEC_UNIFORM_AB - Fatal error!')
+
+    x = numpy.zeros(n)
+
+    for i in range(0, n):
+
+        k = (seed // 127773)
+
+        seed = 16807 * (seed - k * 127773) - k * 2836
+
+        if (seed < 0):
+            seed = seed + i4_huge
+
+        x[i] = a + (b - a) * seed * 4.656612875E-10
+
+    return x, seed
+
+
+def r8vec_uniform_ab_test():
+
+    # *****************************************************************************80
+    #
+    # R8VEC_UNIFORM_AB_TEST tests R8VEC_UNIFORM_AB.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    29 October 2014
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+
+    n = 10
+    a = -1.0
+    b = +5.0
+    seed = 123456789
+
+    print('')
+    print('R8VEC_UNIFORM_AB_TEST')
+    print('  R8VEC_UNIFORM_AB computes a random R8VEC.')
+    print('')
+    print('  %g <= X <= %g' % (a, b))
+    print('  Initial seed is %d' % (seed))
+
+    v, seed = r8vec_uniform_ab(n, a, b, seed)
+
+    r8vec_print(n, v, '  Random R8VEC:')
+#
+#  Terminate.
+#
+    print('')
+    print('R8VEC_UNIFORM_AB_TEST:')
+    print('  Normal end of execution.')
+    return
+
+
+def sphere01_area():
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_AREA returns the area of the surface of the unit sphere in 3D.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    24 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Parameters:
+    #
+    #    Output, real VALUE, the area.
+    #
+    import numpy as np
+
+    r = 1.0
+    value = 4.0 * np.pi * r * r
+
+    return value
+
+
+def sphere01_area_test():
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_AREA_TEST tests SPHERE01_AREA.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    23 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import platform
+
+    print('')
+    print('SPHERE01_AREA_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  SPHERE01_AREA returns the volume of the unit sphere.')
+    print('')
+
+    value = sphere01_area()
+
+    print('  SPHERE01_AREA() =  %g' % (value))
+#
+#  Terminate.
+#
+    print('')
+    print('SPHERE01_AREA_TEST')
+    print('  Normal end of execution.')
+    return
+
+
+def sphere01_monomial_integral(e):
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_MONOMIAL_INTEGRAL returns monomial integrals on the unit sphere.
+    #
+    #  Discussion:
+    #
+    #    The integration region is
+    #
+    #      X^2 + Y^2 + Z^2 = 1.
+    #
+    #    The monomial is F(X,Y,Z) = X^E(1) * Y^E(2) * Z^E(3).
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    23 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Philip Davis, Philip Rabinowitz,
+    #    Methods of Numerical Integration,
+    #    Second Edition,
+    #    Academic Press, 1984, page 263.
+    #
+    #  Parameters:
+    #
+    #    Input, integer E(3), the exponents of X, Y and Z in the
+    #    monomial.  Each exponent must be nonnegative.
+    #
+    #    Output, real INTEGRAL, the integral.
+    #
+    import numpy as np
+    from sys import exit
+
+    for i in range(0, 3):
+        if (e[i] < 0):
+            print('')
+            print('SPHERE01_MONOMIAL_INTEGRAL - Fatal error!')
+            print('  All exponents must be nonnegative.')
+            error('SPHERE01_MONOMIAL_INTEGRAL - Fatal error!')
+
+    if (e[0] == 0 and e[1] == 0 and e[2] == 0):
+
+        integral = 2.0 * np.sqrt((np.pi) ** 3) / r8_gamma(1.5)
+        return integral
+
+    for i in range(0, 3):
+        if ((e[i] % 2) == 1):
+            integral = 0.0
+            return integral
+
+    integral = 2.0
+
+    e_sum = 0
+    for i in range(0, 3):
+        integral = integral * r8_gamma(0.5 * float(e[i] + 1))
+        e_sum = e_sum + e[i] + 1
+
+    integral = integral / r8_gamma(0.5 * float(e_sum))
+
+    return integral
+
+
+def sphere01_monomial_integral_test():
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_MONOMIAL_INTEGRAL_TEST tests SPHERE01_MONOMIAL_INTEGRAL.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    22 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+    import platform
+
+    m = 3
+
+    print('')
+    print('SPHERE01_MONOMIAL_INTEGRAL_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  SPHERE01_MONOMIAL_INTEGRAL returns the integral of a monomial')
+    print('  over the surface of the unit sphere in 3D.')
+    print('  Compare with a Monte Carlo estimate.')
+#
+#  Get sample points.
+#
+    n = 8192
+    seed = 123456789
+    x, seed = sphere01_sample(n, seed)
+#
+#  Randomly choose X,Y,Z exponents between (0,0,0) and (9,9,9).
+#
+    print('')
+    print('  If any exponent is odd, the integral is zero.')
+    print('  We will restrict this test to randomly chosen even exponents.')
+    print('')
+    print('  Ex  Ey  Ez     MC-Estimate           Exact      Error')
+    print('')
+
+    test_num = 20
+    for test in range(0, test_num):
+
+        e, seed = i4vec_uniform_ab(m, 0, 4, seed)
+        for i in range(0, m):
+            e[i] = e[i] * 2
+
+        value = monomial_value(m, n, e, x)
+
+        result = sphere01_area() * np.sum(value) / float(n)
+        exact = sphere01_monomial_integral(e)
+        error = abs(result - exact)
+
+        for i in range(0, m):
+            print('  %2d' % (e[i])),
+        print('  %14.6g  %14.6g  %10.2g' % (result, exact, error))
+#
+#  Terminate.
+#
+    print('')
+    print('SPHERE01_MONOMIAL_INTEGRAL_TEST')
+    print('  Normal end of execution.')
+    return
+
+
+def sphere01_monte_carlo_test():
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_MONTE_CARLO_TEST uses the Monte Carlo method on the unit sphere.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    14 November 2016
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import numpy as np
+
+    e_test = np.array([
+        [0, 0, 0],
+        [2, 0, 0],
+        [0, 2, 0],
+        [0, 0, 2],
+        [4, 0, 0],
+        [2, 2, 0],
+        [0, 0, 4]])
+
+    print('')
+    print('SPHERE01_MONTE_CARLO_TEST')
+    print('  Use SPHERE01_SAMPLE to estimate integrals over ')
+    print('  the surface of the unit sphere.')
+
+    obj = plot3d()
+    obj.create_tempdir(-1)
+
+    seed = 123456789
+    n = 1
+    while (n <= 65536):
+        x, seed = sphere01_sample(n, seed)
+        print('  %8d' % (n), end='')
+        for e in e_test:
+            value = monomial_value(3, n, e, x)
+            result = sphere01_area() * np.sum(value[0:n]) / float(n)
+            print('\t%14.6g' % (result), end='')
+        print('')
+
+        obj.axs.scatter(*x, s=0.5)
+        obj.axs.set_title("n={:d}".format(n))
+        obj.SavePng_Serial(obj.rootname)
+        plt.close()
+        obj.new_fig()
+
+        n = 2 * n
+
+    print('')
+    print('     Exact'),
+    for j in range(0, 7):
+
+        e[0:3] = e_test[j, 0:3]
+
+        result = sphere01_monomial_integral(e)
+
+        print('  %14f' % (result)),
+
+    print('')
+
+    return
+
+
+def sphere01_sample(n, seed):
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_SAMPLE samples points from the surface of the unit sphere in 3D.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    23 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Reference:
+    #
+    #    Russell Cheng,
+    #    Random Variate Generation,
+    #    in Handbook of Simulation,
+    #    edited by Jerry Banks,
+    #    Wiley, 1998, pages 168.
+    #
+    #    Reuven Rubinstein,
+    #    Monte Carlo Optimization, Simulation, and Sensitivity
+    #    of Queueing Networks,
+    #    Krieger, 1992,
+    #    ISBN: 0894647644,
+    #    LC: QA298.R79.
+    #
+    #  Parameters:
+    #
+    #    Input, integer N, the number of points.
+    #
+    #    Input/output, integer SEED, a seed for the random
+    #    number generator.
+    #
+    #    Output, real X(3,N), the points.
+    #
+    import numpy as np
+
+    m = 3
+
+    x = np.zeros([m, n])
+
+    for j in range(0, n):
+        #
+        #  Fill a vector with normally distributed values.
+        #
+        v, seed = r8vec_normal_01(m, seed)
+#
+#  Compute the length of the vector.
+#
+        norm = r8vec_norm(m, v)
+#
+#  Normalize the vector.
+#
+        for i in range(0, m):
+            x[i, j] = v[i] / norm
+
+    return x, seed
+
+
+def sphere01_sample_test():
+
+    # *****************************************************************************80
+    #
+    # SPHERE01_SAMPLE_TEST tests SPHERE01_SAMPLE.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    23 June 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    import platform
+
+    print('')
+    print('SPHERE01_SAMPLE_TEST')
+    print('  Python version: %s' % (platform.python_version()))
+    print('  SPHERE01_SAMPLE samples the unit sphere.')
+
+    m = 3
+    n = 10
+    seed = 123456789
+
+    x, seed = sphere01_sample(n, seed)
+
+    r8mat_transpose_print(m, n, x, '  Sample points on the unit sphere.')
+#
+#  Terminate.
+#
+    print('')
+    print('SPHERE01_SAMPLE_TEST')
+    print('  Normal end of execution.')
+    return
+
+
 def timestamp():
 
     # *****************************************************************************80
@@ -2411,18 +2594,11 @@ def timestamp():
     return None
 
 
-def uniform_in_sphere01_map(m, n, seed):
+def timestamp_test():
 
     # *****************************************************************************80
     #
-    # UNIFORM_IN_SPHERE01_MAP maps uniform points in the unit M-dimensional sphere.
-    #
-    #  Discussion:
-    #
-    #    The sphere has center 0 and radius 1.
-    #
-    #    We first generate a point ON the sphere, and then distribute it
-    #    IN the sphere.
+    # TIMESTAMP_TEST tests TIMESTAMP.
     #
     #  Licensing:
     #
@@ -2430,111 +2606,39 @@ def uniform_in_sphere01_map(m, n, seed):
     #
     #  Modified:
     #
-    #    08 November 2016
+    #    03 December 2014
     #
     #  Author:
     #
     #    John Burkardt
-    #
-    #  Reference:
-    #
-    #    Russell Cheng,
-    #    Random Variate Generation,
-    #    in Handbook of Simulation,
-    #    edited by Jerry Banks,
-    #    Wiley, 1998, pages 168.
-    #
-    #    Reuven Rubinstein,
-    #    Monte Carlo Optimization, Simulation, and Sensitivity
-    #    of Queueing Networks,
-    #    Wiley, 1986, page 232.
     #
     #  Parameters:
     #
-    #    Input, integer M, the dimension of the space.
-    #
-    #    Input, integer N, the number of points.
-    #
-    #    Input/output, integer SEED, a seed for the random number generator.
-    #
-    #    Output, real X(M,N), the points.
-    #
-    import numpy as np
-
-    exponent = 1.0 / float(m)
-
-    x = np.zeros([m, n])
-
-    for j in range(0, n):
-        #
-        #  Fill a vector with normally distributed values.
-        #
-        v, seed = r8vec_normal_01(m, seed)
-#
-#  Compute the length of the vector.
-#
-        norm = np.linalg.norm(v)
-#
-#  Normalize the vector.
-#
-        v[0:m] = v[0:m] / norm
-#
-#  Now compute a value to map the point ON the sphere INTO the sphere.
-#
-        r, seed = r8_uniform_01(seed)
-
-        x[0:m, j] = r ** exponent * v[0:m]
-
-    return x, seed
-
-
-def uniform_in_sphere01_map_test():
-
-    # *****************************************************************************80
-    #
-    # UNIFORM_IN_SPHERE01_MAP_TEST tests UNIFORM_IN_SPHERE01_MAP.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    08 November 2016
-    #
-    #  Author:
-    #
-    #    John Burkardt
+    #    None
     #
     import platform
 
     print('')
-    print('UNIFORM_IN_SPHERE01_MAP_TEST')
+    print('TIMESTAMP_TEST:')
     print('  Python version: %s' % (platform.python_version()))
-    print('  UNIFORM_IN_SPHERE01_MAP computes points uniformly distributed')
-    print('  inside the M-dimensional unit sphere.')
+    print('  TIMESTAMP prints a timestamp of the current date and time.')
+    print('')
 
-    m = 3
-    n = 10
-    seed = 123456789
-
-    x, seed = uniform_in_sphere01_map(m, n, seed)
-
-    r8mat_transpose_print(m, n, x, '  Random points inside unit 3-sphere')
+    timestamp()
 #
 #  Terminate.
 #
     print('')
-    print('UNIFORM_IN_SPHERE01_MAP_TEST')
+    print('TIMESTAMP_TEST:')
     print('  Normal end of execution.')
     return
 
 
-def ellipse_monte_carlo_tests():
+def sphere_monte_carlo_tests():
 
     # *****************************************************************************80
     #
-    # ELLIPSE_MONTE_CARLO_TESTS tests the ELLIPSE_MONTE_CARLO library.
+    # SPHERE_MONTE_CARLO_TESTS tests the SPHERE_MONTE_CARLO library.
     #
     #  Licensing:
     #
@@ -2542,7 +2646,7 @@ def ellipse_monte_carlo_tests():
     #
     #  Modified:
     #
-    #    08 November 2016
+    #    13 November 2016
     #
     #  Author:
     #
@@ -2551,22 +2655,22 @@ def ellipse_monte_carlo_tests():
     import platform
 
     print('')
-    print('ELLIPSE_MONTE_CARLO_TESTS')
+    print('SPHERE_MONTE_CARLO_TESTS')
     print('  Python version: %s' % (platform.python_version()))
-    print('  Test the ELLIPSE_MONTE_CARLO library.')
+    print('  Test the SPHERE_MONTE_CARLO library.')
 
-    ellipse_area1_test()
-    ellipse_area2_test()
-    ellipse_monte_carlo_test()
-    ellipse_sample_test()
+    sphere01_area_test()
+    sphere01_monomial_integral_test()
+    sphere01_monte_carlo_test()
+    sphere01_sample_test()
 
     print('')
-    print('ELLIPSE_MONTE_CARLO_TESTS')
+    print('SPHERE_MONTE_CARLO_TESTS:')
     print('  Normal end of execution.')
     return
 
 
 if (__name__ == '__main__'):
     timestamp()
-    ellipse_monte_carlo_tests()
+    sphere_monte_carlo_tests()
     timestamp()

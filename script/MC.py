@@ -10,7 +10,7 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join('./'))
+sys.path.append(os.path.join('../'))
 from rnd_uniform.uniform import r8vec_uniform_01, r8mat_uniform_01, r8_uniform_01
 from rnd_uniform.sample import triangle01_sample, cube01_sample, ball01_sample, annulus_sample
 from rnd_uniform.sample import circle01_sample_ergodic, circle01_sample_random
