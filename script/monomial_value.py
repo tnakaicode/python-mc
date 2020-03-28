@@ -1,5 +1,16 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import sys
+import os
+import time
+import platform
+
+sys.path.append(os.path.join('../'))
+from utils.r8mat_uniform_ab import r8mat_uniform_ab
+from utils.i4vec_uniform_ab import i4vec_uniform_ab
+from utils.i4vec_transpose_print import i4vec_transpose_print
+from utils.timestamp import timestamp
 
 
 def monomial_value(m, n, e, x):
@@ -40,7 +51,6 @@ def monomial_value(m, n, e, x):
     #
     #    Output, real V(N), the monomial values.
     #
-    import numpy as np
 
     v = np.ones(n)
 
@@ -70,11 +80,6 @@ def monomial_value_test():
     #
     #    John Burkardt
     #
-    import platform
-    from i4vec_transpose_print import i4vec_transpose_print
-    from i4vec_uniform_ab import i4vec_uniform_ab
-    from monomial_value import monomial_value
-    from r8mat_uniform_ab import r8mat_uniform_ab
 
     print('')
     print('MONOMIAL_VALUE_TEST')
@@ -97,9 +102,9 @@ def monomial_value_test():
         e, seed = i4vec_uniform_ab(m, e_min, e_max, seed)
         i4vec_transpose_print(m, e, '  Exponents:')
         x, seed = r8mat_uniform_ab(m, n, x_min, x_max, seed)
-#
-#  To make checking easier, make the X values integers.
-#
+        #
+        #  To make checking easier, make the X values integers.
+        #
         for i in range(0, m):
             for j in range(0, n):
                 x[i, j] = round(x[i, j])
@@ -117,9 +122,9 @@ def monomial_value_test():
             for i in range(0, m):
                 print('%10.4f' % (x[i, j]), end='')
             print('')
-#
-#  Terminate.
-#
+    #
+    #  Terminate.
+    #
     print('')
     print('MONOMIAL_VALUE_TEST')
     print('  Normal end of execution.')
@@ -127,7 +132,6 @@ def monomial_value_test():
 
 
 if (__name__ == '__main__'):
-    from timestamp import timestamp
     timestamp()
     monomial_value_test()
     timestamp()

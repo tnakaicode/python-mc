@@ -1,6 +1,21 @@
 #! /usr/bin/env python3
 #
+import numpy as np
+import sys
+import os
+import time
+import platform
 
+sys.path.append(os.path.join('../'))
+from utils.r8mat_uniform_ab import r8mat_uniform_ab
+from utils.i4vec_uniform_ab import i4vec_uniform_ab
+from utils.i4vec_transpose_print import i4vec_transpose_print
+from utils.timestamp import timestamp
+from utils.r8_uniform_01 import r8_uniform_01
+from utils.r8vec_normal_01 import r8vec_normal_01
+
+from disk01_monomial_integral import disk01_monomial_integral
+    
 
 def disk_sample(center, r, n, seed):
 
@@ -33,9 +48,6 @@ def disk_sample(center, r, n, seed):
     #
     #    Output, real X(2,N), the points.
     #
-    import numpy as np
-    from r8_uniform_01 import r8_uniform_01
-    from r8vec_normal_01 import r8vec_normal_01
 
     x = np.zeros([2, n])
 
@@ -88,11 +100,6 @@ def disk_sample_test(center, r):
     #
     #    Input, real R, the radius of the disk.
     #
-    import platform
-    import numpy as np
-    from disk_area import disk_area
-    from disk01_monomial_integral import disk01_monomial_integral
-    from monomial_value import monomial_value
 
     print('')
     print('DISK_SAMPLE_TEST')
@@ -158,8 +165,6 @@ def disk_sample_test(center, r):
 
 
 if (__name__ == '__main__'):
-    from timestamp import timestamp
-    import numpy as np
     timestamp()
     center = np.array([1.0, 2.0])
     r = 3.0

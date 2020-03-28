@@ -30,8 +30,6 @@ def r8vec_normal_01(n, seed):
     #
     #    Output, integer SEED, an updated seed for the random number generator.
     #
-    import numpy as np
-    from r8_normal_01 import r8_normal_01
 
     x = np.zeros(n)
 
