@@ -6,7 +6,7 @@ import sys
 import os
 import time
 
-sys.path.append(os.path.join('../'))
+sys.path.append(os.path.join('./'))
 from base import plot2d, plot3d
 
 def gamma_log_values(n_data):
