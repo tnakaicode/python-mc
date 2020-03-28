@@ -92,7 +92,4 @@ def r8_normal_01_test():
 
 
 if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
     r8_normal_01_test()
-    timestamp()
