@@ -8,7 +8,9 @@ import time
 
 sys.path.append(os.path.join('../'))
 from base import plot2d, plot3d
+from utils.timestamp import timestamp
 obj = plot3d()
+
 
 def gamma_log_values(n_data):
 
@@ -946,9 +948,9 @@ def pyramid01_monte_carlo_test():
             value = monomial_value(m, n, e, x)
             #result[j] = pyramid01_volume() * np.sum(value) / float(n)
 
-        #for i in range(0, 10):
+        # for i in range(0, 10):
         #    print('  %14.6g' % (result[i])),
-        #print('')
+        # print('')
 
         obj.axs.scatter(*x, s=0.5)
         obj.axs.set_title("n={:d}".format(n))
@@ -958,9 +960,9 @@ def pyramid01_monte_carlo_test():
 
         n = 2 * n
 
-    #print('')
+    # print('')
     #
-    #for j in range(0, 10):
+    # for j in range(0, 10):
     #
     #    for i in range(0, m):
     #        e[i] = e_test[i, j]
@@ -968,9 +970,9 @@ def pyramid01_monte_carlo_test():
     #    result[j] = pyramid01_integral(e)
     #
     #print('     Exact'),
-    #for i in range(0, 10):
+    # for i in range(0, 10):
     #    print('  %14.6g' % (result[i])),
-    #print('')
+    # print('')
     print('')
     print('PYRAMID01_MONTE_CARLO_TEST')
     print('  Normal end of execution.')
@@ -2168,53 +2170,6 @@ def r8mat_uniform_ab(m, n, a, b, seed):
     return r, seed
 
 
-def r8mat_uniform_ab_test():
-
-    # *****************************************************************************80
-    #
-    # R8MAT_UNIFORM_AB_TEST tests R8MAT_UNIFORM_AB.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    31 October 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-    import platform
-
-    m = 5
-    n = 4
-    a = -1.0
-    b = +5.0
-    seed = 123456789
-
-    print('')
-    print('R8MAT_UNIFORM_AB_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8MAT_UNIFORM_AB computes a random R8MAT.')
-    print('')
-    print('  %g <= X <= %g' % (a, b))
-    print('  Initial seed is %d' % (seed))
-
-    v, seed = r8mat_uniform_ab(m, n, a, b, seed)
-
-    r8mat_print(m, n, v, '  Random R8MAT:')
-#
-#  Terminate.
-#
-    print('')
-    print('R8MAT_UNIFORM_AB_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
 def r8_mop(i):
 
     # *****************************************************************************80
@@ -2245,81 +2200,6 @@ def r8_mop(i):
         value = - 1.0
 
     return value
-
-
-def r8_mop_test():
-
-    # *****************************************************************************80
-    #
-    # R8_MOP_TEST tests R8_MOP.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    06 December 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import platform
-
-    print('')
-    print('R8_MOP_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8_MOP evaluates (-1.0)^I4 as an R8.')
-    print('')
-    print('    I4  R8_MOP(I4)')
-    print('')
-
-    i4_min = -100
-    i4_max = +100
-    seed = 123456789
-
-    for test in range(0, 10):
-        i4, seed = i4_uniform_ab(i4_min, i4_max, seed)
-        r8 = r8_mop(i4)
-        print('  %4d  %4.1f' % (i4, r8))
-#
-#  Terminate.
-#
-    print('')
-    print('R8_MOP_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-def timestamp():
-
-    # *****************************************************************************80
-    #
-    # TIMESTAMP prints the date as a timestamp.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    06 April 2013
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    None
-    #
-    import time
-
-    t = time.time()
-    print(time.ctime(t))
-
-    return None
 
 
 if (__name__ == '__main__'):
