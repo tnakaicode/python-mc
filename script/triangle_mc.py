@@ -10,9 +10,8 @@ import os
 import time
 
 sys.path.append(os.path.join('../'))
-from base import plot2d
-from rnd_uniform.sample import triangle01_sample
-obj = plot2d()
+from base import plot2d, plot3d
+from rnd_uniform.sample import triangle01_sample, triangle02_sample
 
 
 def triangle_monte_carlo_test():
@@ -59,6 +58,8 @@ def triangle_monte_carlo_test():
     seed = 123456789
 
     #area = triangle_area(t)
+    obj = plot2d()
+    obj.create_tempdir(-1)
 
     n = 2**5
     while (n <= 2**16):
@@ -94,7 +95,7 @@ def triangle_monte_carlo_test():
     return
 
 
-def reference_to_physical_t3(t, n, ref):
+def reference_to_physical_t3(t, n=2 ** 10, ref=np.zeros([2, 2**10])):
 
     #
     # REFERENCE_TO_PHYSICAL_T3 maps a reference point to a physical point.
@@ -146,159 +147,42 @@ def reference_to_physical_t3(t, n, ref):
     return phy
 
 
-def triangle_monte_carlo_test01():
-
-    # *****************************************************************************80
-    #
-    # TRIANGLE_MONTE_CARLO_TEST01 samples the unit triangle.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    15 August 2009
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import numpy as np
-
-    t = np.array([
-        [1.0, 0.0, 0.0],
-        [0.0, 1.0, 0.0]])
-
-    print('')
-    print('TRIANGLE_MONTE_CARLO_TEST01')
-    print('  Integrate xy^3')
-    print('  Integration region is the unit triangle.')
-    print('  Use an increasing number of points N.')
-
-    seed = 123456789
-
-    print('')
-    print('     N          XY^3')
-    print('')
-
-    n = 1
-
-    while (n <= 65536):
-        result, seed = triangle_monte_carlo(t, n, triangle_integrand, seed)
-        print('  %8d  %14f' % (n, result))
-        n = 2 * n
-    return
-
-
-def triangle_integrand(p):
-
-    # *****************************************************************************80
-    #
-    # TRIANGLE_INTEGRAND evaluates xy^3
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    15 August 2009
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, real P(2,P_NUM), the evaluation points.
-    #
-    #    Output, real FP(P_NUM), the integrand values.
-    #
-    fp = p[0, :] * p[1, :] ** 3
-
-    return fp
-
-
-def triangle_monte_carlo_test02():
-
-    # *****************************************************************************80
-    #
-    # TRIANGLE_MONTE_CARLO_TEST02 samples a general triangle.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    18 July 2018
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-
-    t = np.array([
-        [2.0, 3.0, 0.0],
-        [0.0, 4.0, 3.0]])
-
-    print('')
-    print('TRIANGLE_MONTE_CARLO_TEST02')
-    print('  Integrate xy^3')
-    print('  Integration region is a general triangle.')
-    print('  Use an increasing number of points N.')
-
-    seed = 123456789
-
-    print('')
-    print('     N          XY^3')
-    print('')
-
-    n = 1
-
-    while (n <= 65536):
-
-        result, seed = triangle_monte_carlo(t, n, triangle_integrand, seed)
-
-        print('  %8d  %14f' % (n, result))
-
-        n = 2 * n
-
-    return
-
-
-def triangle_integrand(p):
-
-    # *****************************************************************************80
-    #
-    # TRIANGLE_INTEGRAND evaluates xy^3
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    15 August 2009
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, real P(2,P_NUM), the evaluation points.
-    #
-    #    Output, real FP(P_NUM), the integrand values.
-    #
-    fp = p[0, :] * p[1, :] ** 3
-
-    return fp
+def reference_to_physical_t4(t, n=2 ** 10, ref=np.zeros([2, 2**10])):
+    phy = np.zeros_like(ref)
+    for i, val in enumerate(phy[:, 0]):
+        phy[i, :] = t[i, 0] * (1.0 - ref[0, :] - ref[1, :]) + \
+            t[i, 1] * ref[0, :] + t[i, 2] * ref[1, :]
+    return phy
 
 
 if (__name__ == '__main__'):
-    obj.create_tempdir(-1)
+    seed = 123456789
+    p1, seed = triangle01_sample(3, seed)
+    t1 = np.array([
+        [1.0, 2.0, 0.0],
+        [0.0, 4.0, 5.0]])
+    p1 = reference_to_physical_t3(t1, 3, p1)
+    print(p1)
+
+    p1, seed = triangle01_sample(3, seed)
+    t1 = np.array([
+        [1.0, 2.0, 0.0],
+        [0.0, 4.0, 5.0]])
+    p1 = reference_to_physical_t4(t1, 3, p1)
+    print(p1)
+
+    obj = plot3d()
+    p2, seed = triangle02_sample(3, seed)
+    print(p2)
+    t2 = np.array([
+        [1.0, 2.0, 0.0],
+        [0.0, 4.0, 5.0],
+        [1.0, 3.0, 2.0]])
+    p2 = reference_to_physical_t4(t2, 3, p2)
+    print(p2)
+    obj.axs.plot(*p2)
+    obj.SavePng()
+
     triangle_monte_carlo_test()
     # triangle_monte_carlo_test01()
     # triangle_monte_carlo_test02()

@@ -283,6 +283,18 @@ def triangle01_sample(n, seed):
 
     return xy, seed
 
+def triangle02_sample(n, seed):
+    m = 3
+
+    xy = np.zeros([m, n])
+    for j in range(n):
+        e, seed = r8vec_uniform_01(m, seed)
+        e = - np.log(e)
+        d = np.sum(e)
+        xy[:, j] = e / d
+
+    return xy, seed
+
 
 def polygon_sample(v, n, seed):
 
