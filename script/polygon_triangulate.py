@@ -1,5 +1,40 @@
-#! /usr/bin/env python3
 #
+#  Licensing:
+#
+#    This code is distributed under the GNU LGPL license.
+#
+import numpy as np
+import platform
+
+
+def triangle_area(xa, ya, xb, yb, xc, yc):
+
+    # *****************************************************************************80
+    #
+    # TRIANGLE_AREA computes the signed area of a triangle.
+    #
+    #  Licensing:
+    #
+    #    This code is distributed under the GNU LGPL license.
+    #
+    #  Modified:
+    #
+    #    14 October 2015
+    #
+    #  Author:
+    #
+    #    John Burkardt
+    #
+    #  Parameters:
+    #
+    #    Input, real XA, YA, XB, YB, XC, YC, the coordinates of
+    #    the vertices of the triangle, given in counterclockwise order.
+    #
+    #    Output, real VALUE, the signed area of the triangle.
+    #
+    value = 0.5 * ((xb - xa) * (yc - ya) - (xc - xa) * (yb - ya))
+
+    return value
 
 
 def angle_degree(x1, y1, x2, y2, x3, y3):
@@ -872,8 +907,7 @@ def polygon_area(n, x, y):
 
 
 def polygon_triangulate(n, x, y):
-    
-    # ******************************************************************************/
+
     #
     # POLYGON_TRIANGULATE determines a triangulation of a polygon.
     #
@@ -889,20 +923,7 @@ def polygon_triangulate(n, x, y):
     #
     #    Thanks to Gene Dial for suggesting that the next() array should be
     #    renamed next_node() to avoid the Python keyword next, 22 September 2016.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    2 September 2016
-    #
-    #  Author:
-    #
-    #    Original C version by Joseph ORourke.
-    #    Python version by John Burkardt.
-    #
+    #  
     #  Reference:
     #
     #    Joseph ORourke,
@@ -921,17 +942,15 @@ def polygon_triangulate(n, x, y):
     #
     import numpy as np
     from sys import exit
-#
-#  We must have at least 3 vertices.
-#
+
+    #  We must have at least 3 vertices.
     if (n < 3):
         print('')
         print('POLYGON_TRIANGULATE - Fatal error!')
         print('  N < 3')
         exit('POLYGON_TRIANGULATE - Fatal error!')
-#
-#  Consecutive vertices cannot be equal.
-#
+    
+    #  Consecutive vertices cannot be equal.
     node_m1 = n - 1
     for node in range(0, n):
         if (x[node_m1] == x[node] and y[node_m1] == y[node]):
@@ -941,20 +960,19 @@ def polygon_triangulate(n, x, y):
             exit('POLYGON_TRIANGULATE - Fatal error!')
 
         node_m1 = node
-#
-#  No node can be the vertex of an angle less than 1 degree
-#  in absolute value.
-#
+    #
+    #  No node can be the vertex of an angle less than 1 degree
+    #  in absolute value.
+    #
     node1 = n - 1
 
     for node2 in range(0, n):
-
         node3 = ((node2 + 1) % n)
-
         angle = angle_degree(
             x[node1], y[node1],
             x[node2], y[node2],
-            x[node3], y[node3])
+            x[node3], y[node3]
+        )
 
         if (abs(angle) <= 1.0):
             print('')
@@ -964,9 +982,9 @@ def polygon_triangulate(n, x, y):
             return None
 
         node1 = node2
-#
-#  Area must be positive.
-#
+    #
+    #  Area must be positive.
+    #
     area = polygon_area(n, x, y)
 
     if (area <= 0.0):
@@ -976,9 +994,9 @@ def polygon_triangulate(n, x, y):
         exit('POLYGON_TRIANGULATE - Fatal error!')
 
     triangles = np.zeros([n - 2, 3], dtype=np.int32)
-#
-#  PREV_NODE and NEXT_NODE point to the previous and next nodes.
-#
+    #
+    #  PREV_NODE and NEXT_NODE point to the previous and next nodes.
+    #
     prev_node = np.zeros(n, dtype=np.int32)
     next_node = np.zeros(n, dtype=np.int32)
 
@@ -993,10 +1011,10 @@ def polygon_triangulate(n, x, y):
     i = n - 1
     prev_node[i] = i - 1
     next_node[i] = 0
-#
-#  EAR indicates whether the node and its immediate neighbors form an ear
-#  that can be sliced off immediately.
-#
+    #
+    #  EAR indicates whether the node and its immediate neighbors form an ear
+    #  that can be sliced off immediately.
+    #
     ear = np.zeros(n, dtype=np.bool)
     for i in range(0, n):
         ear[i] = diagonal(prev_node[i], next_node[i], n, prev_node,
@@ -1016,30 +1034,30 @@ def polygon_triangulate(n, x, y):
             i4 = next_node[i3]
             i1 = prev_node[i2]
             i0 = prev_node[i1]
-#
-#  Make vertex I2 disappear.
-#
+            #
+            #  Make vertex I2 disappear.
+            #
             next_node[i1] = i3
             prev_node[i3] = i1
-#
-#  Update the earity of I1 and I3, because I2 disappeared.
-#
+            #
+            #  Update the earity of I1 and I3, because I2 disappeared.
+            #
             ear[i1] = diagonal(i0, i3, n, prev_node, next_node, x, y)
             ear[i3] = diagonal(i1, i4, n, prev_node, next_node, x, y)
-#
-#  Add the diagonal [I3, I1, I2] to the list.
-#
+            #
+            #  Add the diagonal [I3, I1, I2] to the list.
+            #
             triangles[triangle_num, 0] = i3
             triangles[triangle_num, 1] = i1
             triangles[triangle_num, 2] = i2
             triangle_num = triangle_num + 1
-#
-#  Try the next vertex.
-#
+        #
+        #  Try the next vertex.
+        #
         i2 = next_node[i2]
-#
-#  The last triangle is formed from the three remaining vertices.
-#
+    #
+    #  The last triangle is formed from the three remaining vertices.
+    #
     i3 = next_node[i2]
     i1 = prev_node[i2]
 
@@ -1064,19 +1082,9 @@ def polygon_triangulate_test():
     #    For the first N-2 triangles, the first edge listed is always an
     #    internal diagonal.
     #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    14 October 2015
-    #
-    import numpy as np
-    import platform
 
     n = 10
-    x = np.array([8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0, 0.0, 4.0])
+    x = np.array([8.0,  7.0, 6.0,  5.0, 4.0,  3.0, 2.0,  1.0, 0.0,  4.0])
     y = np.array([0.0, 10.0, 0.0, 10.0, 0.0, 10.0, 0.0, 10.0, 0.0, -2.0])
 
     print('')
@@ -1087,9 +1095,9 @@ def polygon_triangulate_test():
     triangles = polygon_triangulate(n, x, y)
 
     i4mat_print(n - 2, 3, triangles, '  Triangles')
-#
-#  Terminate.
-#
+    #
+    #  Terminate.
+    #
     print('')
     print('POLYGON_TRIANGULATE_TEST:')
     print('  Normal end of execution.')
@@ -1126,80 +1134,7 @@ def timestamp():
     return None
 
 
-def timestamp_test():
-
-    # *****************************************************************************80
-    #
-    # TIMESTAMP_TEST tests TIMESTAMP.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    03 December 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    None
-    #
-    import platform
-
-    print('')
-    print('TIMESTAMP_TEST:')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  TIMESTAMP prints a timestamp of the current date and time.')
-    print('')
-
-    timestamp()
-#
-#  Terminate.
-#
-    print('')
-    print('TIMESTAMP_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-def triangle_area(xa, ya, xb, yb, xc, yc):
-
-    # *****************************************************************************80
-    #
-    # TRIANGLE_AREA computes the signed area of a triangle.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    14 October 2015
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    #  Parameters:
-    #
-    #    Input, real XA, YA, XB, YB, XC, YC, the coordinates of
-    #    the vertices of the triangle, given in counterclockwise order.
-    #
-    #    Output, real VALUE, the signed area of the triangle.
-    #
-    value = 0.5 * ((xb - xa) * (yc - ya) - (xc - xa) * (yb - ya))
-
-    return value
-
-
 if (__name__ == '__main__'):
     timestamp()
-    angle_degree_test()
-    i4mat_print_test()
-    i4mat_print_some_test()
     polygon_triangulate_test()
     timestamp()
