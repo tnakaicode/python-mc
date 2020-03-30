@@ -11,6 +11,7 @@ from base import plot2d
 
 obj = plot2d()
 
+
 def monomial_value(m, n, e, x):
 
     # *****************************************************************************80
@@ -885,7 +886,7 @@ def triangle_monte_carlo(t, n, triangle_integrand, seed):
     fp = triangle_integrand(p2)
 
     result = area * np.sum(fp[:]) / float(n)
-    
+
     obj.axs.scatter(*p, s=0.5)
     obj.axs.set_title("n={:d}".format(n))
     obj.SavePng_Serial()

@@ -188,6 +188,13 @@ Monte Carlo method to estimate integrals over the interior of the unit triangle 
 
 ## triangle_monte_carlo.py
 
+## triangle_mc.py
+
+| p0                                 | p1                                 | p2                                 |
+| ---------------------------------- | ---------------------------------- | ---------------------------------- |
+| ![pic](img/triangle_mc-p0_006.png) | ![pic](img/triangle_mc-p1_006.png) | ![pic](img/triangle_mc-p2_006.png) |
+| ![pic](img/triangle_mc-p0_007.png) | ![pic](img/triangle_mc-p1_007.png) | ![pic](img/triangle_mc-p2_007.png) |
+
 ## wedge_monte_carlo.py
 
 Monte Carlo method to estimate integrals over the interior of the unit wedge in 3D.
