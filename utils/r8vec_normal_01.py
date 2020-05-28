@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 #
-
+import numpy as np
 
 def r8vec_normal_01(n, seed):
 

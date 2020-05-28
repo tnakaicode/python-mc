@@ -15,7 +15,7 @@ from utils.r8_uniform_01 import r8_uniform_01
 from utils.r8vec_normal_01 import r8vec_normal_01
 
 from disk01_monomial_integral import disk01_monomial_integral
-    
+
 
 def disk_sample(center, r, n, seed):
 
