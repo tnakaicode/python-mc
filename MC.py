@@ -15,7 +15,7 @@ from rnd_uniform.uniform import r8vec_uniform_01, r8mat_uniform_01, r8_uniform_0
 from rnd_uniform.sample import triangle01_sample, cube01_sample, ball01_sample, annulus_sample
 from rnd_uniform.sample import circle01_sample_ergodic, circle01_sample_random
 from rnd_uniform.sample import hypercube01_sample, polygon_sample, ellipsoid_sample
-from base import plot2d, PlotBase
+from base import plot2d, PlotBase, create_tempnum
 
 
 class MonteCarlo (plot2d):
@@ -49,6 +49,7 @@ class MonteCarlo (plot2d):
         seed = 123456789
         n = 2**5
         while (n <= 2**14):
+            print("n={:d}".format(n))
             self.PlotTest(*triangle01_sample(n, seed),
                           title="triangle")
             self.PlotTest(*cube01_sample(n, seed),
@@ -74,18 +75,20 @@ class MonteCarlo (plot2d):
         dim, num = x.shape
         titletxt = "{} n={:d}".format(title, num)
         if title == None:
-            pngname = self.tempname + ".png"
+            pngname = create_tempnum(self.tempname, ext=".png")
         else:
-            pngname = self.tempname + "_" + title + ".png"
-        
-        if dim ==2 :
+            pngname = create_tempnum(self.tempname + "_" + title, ext=".png")
+
+        if dim == 2:
             self.new_2Dfig()
             self.axs.scatter(*x, s=0.5)
             self.axs.set_title(titletxt)
+            self.SavePng(pngname)
         else:
+            self.new_2Dfig()
             self.contourf_tri(*x, title=titletxt, pngname=pngname)
         plt.close("all")
-        
+
 
 if (__name__ == '__main__'):
     obj = MonteCarlo()
