@@ -10,6 +10,7 @@ import glob
 import shutil
 import datetime
 import platform
+from scipy.spatial import ConvexHull, Delaunay
 from optparse import OptionParser
 from matplotlib import animation
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -109,6 +110,7 @@ class PlotBase(SetDir):
         if pngname == None:
             pngname = self.tmpdir + self.rootname + ".png"
         self.fig.savefig(pngname)
+        return pngname
 
     def SavePng_Serial(self, pngname=None):
         if pngname == None:
@@ -120,6 +122,7 @@ class PlotBase(SetDir):
             pngname, extname = os.path.splitext(basename)
         pngname = create_tempnum(pngname, dirname, ".png")
         self.fig.savefig(pngname)
+        return pngname
 
     def Show(self):
         try:
@@ -129,7 +132,7 @@ class PlotBase(SetDir):
 
 
 class plot2d (PlotBase):
-
+    
     def __init__(self, aspect="equal"):
         PlotBase.__init__(self)
         self.dim = 2
@@ -158,6 +161,15 @@ class plot2d (PlotBase):
         self.ax_y.xaxis.grid(True, zorder=0)
         self.ax_y.yaxis.grid(True, zorder=0)
 
+    def sxy_to_nxy(self, mesh, sxy=[0, 0]):
+        sx, sy = sxy
+        nx, ny = mesh[0].shape
+        xs, ys = mesh[0][0, 0], mesh[1][0, 0]
+        xe, ye = mesh[0][0, -1], mesh[1][-1, 0]
+        dx, dy = mesh[0][0, 1] - mesh[0][0, 0], mesh[1][1, 0] - mesh[1][0, 0]
+        mx, my = int((sy - ys) / dy), int((sx - xs) / dx)
+        return [mx, my]
+
     def contourf_sub(self, mesh, func, sxy=[0, 0], pngname=None):
         self.new_fig()
         self.div_axs()
@@ -175,29 +187,103 @@ class plot2d (PlotBase):
         im = self.axs.contourf(*mesh, func, cmap="jet")
         self.fig.colorbar(im, ax=self.axs, shrink=0.9)
         self.fig.tight_layout()
-        self.SavePng(pngname)
+        if pngname == None:
+            self.SavePng_Serial(pngname)
+        else:
+            self.SavePng(pngname)
 
-    def contourf_sub1(self, mesh, func, sxy=[0, 0]):
-        self.new_fig()
-        nx, ny = mesh[0].shape
-        sx, sy = sxy
-        xs, xe = mesh[0][0, 0], mesh[0][0, -1]
-        ys, ye = mesh[1][0, 0], mesh[1][-1, 0]
-        mx = np.searchsorted(mesh[0][:, 0], sx) - 1
-        my = np.searchsorted(mesh[1][0, :], sy) - 1
+    def contourf_tri(self, x, y, z, lim=[-1, 1, -1, 1], title="", pngname=None):
+        self.axs.tricontourf(x, y, z, cmap="jet")
+        self.axs.set_title(title)
+        self.axs.set_xlim(lim[0], lim[1])
+        self.axs.set_ylim(lim[2], lim[3])
+
+        if pngname == None:
+            pngname = self.SavePng_Serial(pngname)
+        else:
+            pngname = self.SavePng(pngname)
+        png_root, _ = os.path.splitext(pngname)
+        self.axs.scatter(x, y, 5.0)
+        self.SavePng(png_root + "_dot.png")
+
+        pnt = np.array([x, y]).T
+        cov = ConvexHull(pnt)
+        tri = Delaunay(pnt)
+        for idx in tri.simplices:
+            xi = pnt[idx, 0]
+            yi = pnt[idx, 1]
+            self.axs.plot(xi, yi, "k", lw=0.5)
+        self.axs.plot(pnt[cov.vertices, 0],
+                      pnt[cov.vertices, 1], "k", lw=1.0)
+        self.SavePng(png_root + "_grd.png")
+
+        self.new_2Dfig()
+        self.axs.set_title(title)
+        self.axs.scatter(x, y, 5.0)
+        self.axs.set_xlim(lim[0], lim[1])
+        self.axs.set_ylim(lim[2], lim[3])
+        for idx in tri.simplices:
+            xi = pnt[idx, 0]
+            yi = pnt[idx, 1]
+            self.axs.plot(xi, yi, "k", lw=0.75)
+        self.axs.plot(pnt[cov.vertices, 0],
+                      pnt[cov.vertices, 1], "k", lw=1.5)
+        self.SavePng(png_root + "_grid.png")
+
+    def contourf_div(self, mesh, func, loc=[0, 0], txt="", title="name", pngname=None, level=None):
+        sx, sy = loc
+        nx, ny = func.shape
+        xs, ys = mesh[0][0, 0], mesh[1][0, 0]
+        xe, ye = mesh[0][0, -1], mesh[1][-1, 0]
+        dx, dy = mesh[0][0, 1] - mesh[0][0, 0], mesh[1][1, 0] - mesh[1][0, 0]
+        mx, my = int((sy - ys) / dy), int((sx - xs) / dx)
+        tx, ty = 1.1, 0.0
 
         self.div_axs()
-        self.ax_x.plot(mesh[0][:, my], func[:, my])
+        self.ax_x.plot(mesh[0][mx, :], func[mx, :])
         self.ax_x.set_title("y = {:.2f}".format(sy))
-        self.ax_y.plot(func[mx, :], mesh[1][mx, :])
-        self.ax_y.set_title("x = {:.2f}".format(sx))
-        im = self.axs.contourf(*mesh, func, cmap="jet")
-        self.fig.colorbar(im, ax=self.axs, shrink=0.9)
-        plt.tight_layout()
 
-    def contourf_tri(self, x, y, z):
-        self.new_fig()
-        self.axs.tricontourf(x, y, z, cmap="jet")
+        self.ax_y.plot(func[:, my], mesh[1][:, my])
+        self.ax_y.set_title("x = {:.2f}".format(sx))
+
+        self.fig.text(tx, ty, txt, transform=self.ax_x.transAxes)
+        im = self.axs.contourf(*mesh, func, cmap="jet", levels=level)
+        self.axs.set_title(title)
+        self.fig.colorbar(im, ax=self.axs, shrink=0.9)
+
+        plt.tight_layout()
+        if pngname == None:
+            self.SavePng_Serial(pngname)
+        else:
+            self.SavePng(pngname)
+
+    def contourf_div_auto(self, mesh, func, loc=[0, 0], txt="", title="name", pngname=None, level=None):
+        sx, sy = loc
+        nx, ny = func.shape
+        xs, ys = mesh[0][0, 0], mesh[1][0, 0]
+        xe, ye = mesh[0][0, -1], mesh[1][-1, 0]
+        dx, dy = mesh[0][0, 1] - mesh[0][0, 0], mesh[1][1, 0] - mesh[1][0, 0]
+        mx, my = int((sy - ys) / dy), int((sx - xs) / dx)
+        tx, ty = 1.1, 0.0
+
+        self.div_axs()
+        self.axs.set_aspect('auto')
+        self.ax_x.plot(mesh[0][mx, :], func[mx, :])
+        self.ax_x.set_title("y = {:.2f}".format(sy))
+
+        self.ax_y.plot(func[:, my], mesh[1][:, my])
+        self.ax_y.set_title("x = {:.2f}".format(sx))
+
+        self.fig.text(tx, ty, txt, transform=self.ax_x.transAxes)
+        im = self.axs.contourf(*mesh, func, cmap="jet", levels=level)
+        self.axs.set_title(title)
+        self.fig.colorbar(im, ax=self.axs, shrink=0.9)
+
+        plt.tight_layout()
+        if pngname == None:
+            self.SavePng_Serial(pngname)
+        else:
+            self.SavePng(pngname)
 
 
 class plot3d (PlotBase):
