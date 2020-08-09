@@ -14,7 +14,9 @@ from utils.timestamp import timestamp
 from utils.r8_uniform_01 import r8_uniform_01
 from utils.r8vec_normal_01 import r8vec_normal_01
 
-from disk01_monomial_integral import disk01_monomial_integral
+from script.disk01_monomial_integral import disk01_monomial_integral
+from script.monomial_value import monomial_value
+from script.disk_area import disk_area
 
 
 def disk_sample(center, r, n, seed):
