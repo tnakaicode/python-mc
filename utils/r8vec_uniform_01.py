@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import platform
+from sys import exit
 
 
 def r8vec_uniform_01(n, seed):
@@ -59,8 +62,6 @@ def r8vec_uniform_01(n, seed):
     #
     #    Output, integer SEED, an updated seed for the random number generator.
     #
-    import numpy as np
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -109,8 +110,6 @@ def r8vec_uniform_01_test():
     #
     #    John Burkardt
     #
-    import numpy as np
-    import platform
     from r8vec_print import r8vec_print
 
     n = 10
@@ -133,10 +132,3 @@ def r8vec_uniform_01_test():
     print('R8VEC_UNIFORM_01_TEST:')
     print('  Normal end of execution.')
     return
-
-
-if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
-    r8vec_uniform_01_test()
-    timestamp()

@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 #
+import platform
+from sys import exit
 
 
 def r8_uniform_01(seed):
@@ -78,7 +80,6 @@ def r8_uniform_01(seed):
     #    Output, integer SEED, the updated seed.  This would
     #    normally be used as the input seed on the next call.
     #
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -125,7 +126,6 @@ def r8_uniform_01_test():
     #
     #    John Burkardt
     #
-    import platform
 
     print('')
     print('R8_UNIFORM_01_TEST')

@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import platform
+from sys import exit
 
 
 def i4vec_uniform_ab(n, a, b, seed):
@@ -61,8 +64,6 @@ def i4vec_uniform_ab(n, a, b, seed):
     #
     #    Output, integer SEED, the updated seed.
     #
-    import numpy as np
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -100,59 +101,3 @@ def i4vec_uniform_ab(n, a, b, seed):
         c[i] = value
 
     return c, seed
-
-
-def i4vec_uniform_ab_test():
-
-    # *****************************************************************************80
-    #
-    # I4VEC_UNIFORM_AB_TEST tests I4VEC_UNIFORM_AB.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    27 October 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import platform
-    from i4vec_print import i4vec_print
-
-    n = 20
-    a = -100
-    b = 200
-    seed = 123456789
-
-    print('')
-    print('I4VEC_UNIFORM_AB_TEST')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  I4VEC_UNIFORM_AB computes pseudorandom values')
-    print('  in an interval [A,B].')
-    print('')
-    print('  The lower endpoint A = %d' % (a))
-    print('  The upper endpoint B = %d' % (b))
-    print('  The initial seed is %d' % (seed))
-    print('')
-
-    v, seed = i4vec_uniform_ab(n, a, b, seed)
-
-    i4vec_print(n, v, '  The random vector:')
-#
-#  Terminate.
-#
-    print('')
-    print('I4VEC_UNIFORM_AB_TEST:')
-    print('  Normal end of execution.')
-    return
-
-
-if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
-    i4vec_uniform_ab_test()
-    timestamp()

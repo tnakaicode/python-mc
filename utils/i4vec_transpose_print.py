@@ -1,5 +1,7 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import platform
 
 
 def i4vec_transpose_print(n, a, title):
@@ -71,8 +73,6 @@ def i4vec_transpose_print_test():
     #
     #    John Burkardt
     #
-    import numpy as np
-    import platform
 
     print('')
     print('I4VEC_TRANSPOSE_PRINT_TEST')
@@ -95,10 +95,3 @@ def i4vec_transpose_print_test():
     print('I4VEC_TRANSPOSE_PRINT_TEST:')
     print('  Normal end of execution.')
     return
-
-
-if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
-    i4vec_transpose_print_test()
-    timestamp()

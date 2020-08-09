@@ -56,7 +56,7 @@ Monte Carlo method to estimate integrals over the interior of a disk in 2D.
 
 Monte Carlo method to estimate the value of integrals over the interior of an ellipse in 2D.
 
-$x'' * A * x <= r^2$  
+$x''*A*x <= r^2$  
 $a x^2 + b xy + c y^2 = d$
 
 A = (  a  b/2 )

@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import platform
+from math import exp, floor, log, sin
 
 
 def r8_gamma(x):
@@ -56,14 +59,9 @@ def r8_gamma(x):
     #
     #    Output, real VALUE, the value of the function.
     #
-    import numpy as np
-    from math import exp
-    from math import floor
-    from math import log
-    from math import sin
-#
-#  Coefficients for minimax approximation over (12, INF).
-#
+    #
+    #  Coefficients for minimax approximation over (12, INF).
+    #
     c = np.array([
         -1.910444077728E-03,
         8.4171387781295E-04,
@@ -72,22 +70,22 @@ def r8_gamma(x):
         -2.777777777777681622553E-03,
         8.333333333333333331554247E-02,
         5.7083835261E-03])
-#
-#  Mathematical constants
-#
+    #
+    #  Mathematical constants
+    #
     r8_pi = 3.141592653589793
     sqrtpi = 0.9189385332046727417803297
-#
-#  Machine dependent parameters
-#
+    #
+    #  Machine dependent parameters
+    #
     xbig = 171.624
     xminin = 2.23E-308
     eps = 2.22E-16
     xinf = 1.79E+308
-#
-#  Numerator and denominator coefficients for rational minimax
-#  approximation over (1,2).
-#
+    #
+    #  Numerator and denominator coefficients for rational minimax
+    #  approximation over (1,2).
+    #
     p = np.array([
         -1.71618513886549492533811E+00,
         2.47656508055759199108314E+01,
@@ -112,9 +110,9 @@ def r8_gamma(x):
     fact = 1.0
     n = 0
     y = x
-#
-#  Argument is negative.
-#
+    #
+    #  Argument is negative.
+    #
     if (y <= 0.0):
 
         y = - x
@@ -134,9 +132,9 @@ def r8_gamma(x):
             res = xinf
             value = res
             return value
-#
-#  Argument is positive.
-#
+    #
+    #  Argument is positive.
+    #
     if (y < eps):
         #
         #  Argument < EPS.
@@ -152,9 +150,9 @@ def r8_gamma(x):
     elif (y < 12.0):
 
         y1 = y
-#
-#  0.0 < argument < 1.0.
-#
+        #
+        #  0.0 < argument < 1.0.
+        #
         if (y < 1.0):
 
             z = y
@@ -224,60 +222,3 @@ def r8_gamma(x):
     value = res
 
     return value
-
-
-def r8_gamma_test():
-
-    # *****************************************************************************80
-    #
-    # R8_GAMMA_TEST demonstrates the use of R8_GAMMA.
-    #
-    #  Licensing:
-    #
-    #    This code is distributed under the GNU LGPL license.
-    #
-    #  Modified:
-    #
-    #    25 July 2014
-    #
-    #  Author:
-    #
-    #    John Burkardt
-    #
-    import platform
-    from gamma_values import gamma_values
-
-    print('')
-    print('R8_GAMMA_TEST:')
-    print('  Python version: %s' % (platform.python_version()))
-    print('  R8_GAMMA evaluates the Gamma function.')
-    print('')
-    print('      X            GAMMA(X)      R8_GAMMA(X)')
-    print('')
-
-    n_data = 0
-
-    while (True):
-
-        n_data, x, fx1 = gamma_values(n_data)
-
-        if (n_data == 0):
-            break
-
-        fx2 = r8_gamma(x)
-
-        print('  %12g  %24.16g  %24.16g' % (x, fx1, fx2))
-#
-#  Terminate.
-#
-    print('')
-    print('R8_GAMMA_TEST')
-    print('  Normal end of execution.')
-    return
-
-
-if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
-    r8_gamma_test()
-    timestamp()

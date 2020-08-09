@@ -1,5 +1,9 @@
 #! /usr/bin/env python
 #
+import numpy as np
+import platform
+from math import floor
+from sys import exit
 
 
 def r8mat_uniform_ab(m, n, a, b, seed):
@@ -67,9 +71,6 @@ def r8mat_uniform_ab(m, n, a, b, seed):
     #    Output, integer SEED, the updated seed.  This would
     #    normally be used as the input seed on the next call.
     #
-    import numpy
-    from math import floor
-    from sys import exit
 
     i4_huge = 2147483647
 
@@ -84,24 +85,17 @@ def r8mat_uniform_ab(m, n, a, b, seed):
         print('  Input SEED = 0!')
         exit('R8MAT_UNIFORM_AB - Fatal error!')
 
-    r = numpy.zeros((m, n))
+    r = np.zeros((m, n))
 
     for j in range(0, n):
         for i in range(0, m):
-
             k = (seed // 127773)
-
             seed = 16807 * (seed - k * 127773) - k * 2836
-
             seed = floor(seed)
-
             seed = (seed % i4_huge)
-
             if (seed < 0):
                 seed = seed + i4_huge
-
             r[i][j] = a + (b - a) * seed * 4.656612875E-10
-
     return r, seed
 
 
@@ -123,9 +117,6 @@ def r8mat_uniform_ab_test():
     #
     #    John Burkardt
     #
-    import numpy as np
-    import platform
-    from r8mat_print import r8mat_print
 
     m = 5
     n = 4
@@ -144,17 +135,7 @@ def r8mat_uniform_ab_test():
     v, seed = r8mat_uniform_ab(m, n, a, b, seed)
 
     r8mat_print(m, n, v, '  Random R8MAT:')
-#
-#  Terminate.
-#
     print('')
     print('R8MAT_UNIFORM_AB_TEST:')
     print('  Normal end of execution.')
     return
-
-
-if (__name__ == '__main__'):
-    from timestamp import timestamp
-    timestamp()
-    r8mat_uniform_ab_test()
-    timestamp()
