@@ -1,5 +1,15 @@
 #! /usr/bin/env python3
 #
+import numpy as np
+import matplotlib.pyplot as plt
+import sys
+import os
+import time
+
+sys.path.append(os.path.join('../'))
+from base import plot2d, plot3d
+from utils.timestamp import timestamp
+from utils.plot import plot_1d
 
 
 def line01_length():
@@ -163,9 +173,6 @@ def line01_monomial_integral_test():
     print('   E     MC-Estimate      Exact           Error')
     print('')
 
-    import numpy as np
-    from plot import plot_1d
-
     dat = []
     for test in range(0, test_num):
 
@@ -280,7 +287,6 @@ def line01_sample_ergodic_test():
         n = 2 * n
     dat = np.array(dat)
 
-    from plot import plot_1d
     plot_1d(dat, "./line_monte_carlo_ergotic.png")
 
     print('')
@@ -383,7 +389,6 @@ def line01_sample_random_test():
         n = 2 * n
     dat = np.array(dat)
 
-    from plot import plot_1d
     plot_1d(dat, "./line_monte_carlo_random.png")
 
     print('')

@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 import time
+import platform
 
 sys.path.append(os.path.join('../'))
 from base import plot2d, plot3d
@@ -31,8 +32,6 @@ def polygon_monte_carlo_test():
     #
     #    John Burkardt
     #
-    import numpy as np
-    import platform
 
     nv = 4
 
@@ -172,11 +171,9 @@ def polygon_sample(nv, v, n, seed):
     for j in range(0, n):
         #  Choose triangle I at random, based on areas.
         area_percent, seed = r8_uniform_01(seed)
-
+        i = None
         for k in range(0, nv - 2):
-
             i = k
-
             if (area_percent <= area_cumulative[k]):
                 break
 

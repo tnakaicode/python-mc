@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 #
+import platform
 
 
 def gamma_values(n_data):
@@ -252,7 +253,6 @@ def hypersphere01_area_test():
     #
     #    John Burkardt
     #
-    import platform
 
     print('')
     print('HYPERSPHERE01_AREA_TEST')
@@ -316,7 +316,7 @@ def hypersphere01_monomial_integral(m, e):
             print('')
             print('HYPERSPHERE01_MONOMIAL_INTEGRAL - Fatal error!')
             print('  All exponents must be nonnegative.')
-            error('HYPERSPHERE01_MONOMIAL_INTEGRAL - Fatal error!')
+            #error('HYPERSPHERE01_MONOMIAL_INTEGRAL - Fatal error!')
 
     for i in range(0, m):
         if ((e[i] % 2) == 1):
